@@ -22,6 +22,7 @@ interface DocumentCardProps {
     viewCount?: number;
     semester?: string;
     fileSize?: number; // File size in bytes
+    viewMode?: 'grid' | 'list';
 }
 
 export const DocumentCard = ({
@@ -40,7 +41,8 @@ export const DocumentCard = ({
     previewMode = false,
     viewCount,
     semester,
-    fileSize
+    fileSize,
+    viewMode = 'grid'
 }: DocumentCardProps) => {
     const universityAbbr = getUniversityAbbreviation(university);
     const displayCode = universityAbbr !== university
@@ -71,49 +73,79 @@ export const DocumentCard = ({
             </div>
 
             <div className={styles.content}>
-                <div className={styles.header}>
-                    <div className={styles.headerLeft}>
-                        <Badge variant="neutral">{displayCode}</Badge>
-                        {semester && (
-                            <Badge variant="neutral" className={styles.semesterBadge}>
-                                {semester}
-                            </Badge>
+                {viewMode === 'list' ? (
+                    <>
+                        {/* List view: Grade - University - Course code - Title - Author · Pages · MB | Price Views */}
+                        {grade && (
+                            <div className={styles.listGradeBadge}>
+                                <GradeBadge grade={grade} verified={gradeVerified} size="small" />
+                            </div>
                         )}
-                    </div>
-                    <span className={styles.university}>{universityAbbr}</span>
-                </div>
+                        <Badge variant="neutral" className={styles.listBadge}>{universityAbbr}</Badge>
+                        <Badge variant="neutral" className={styles.listBadge}>{displayCode}</Badge>
+                        <h3 className={styles.title} title={title}>{title}</h3>
+                        <span className={styles.author}>{author}</span>
+                        <span className={styles.pages}>{pages} sider</span>
+                        {fileSize && (
+                            <span className={styles.fileSize}>{formatFileSize(fileSize)}</span>
+                        )}
+                        <div className={styles.footer}>
+                            <div className={styles.price}>{price},-</div>
+                            <div className={styles.viewCount}>
+                                <span className={styles.eye}>👁</span>
+                                <span>{viewCount ?? 0}</span>
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <div className={styles.header}>
+                            <div className={styles.headerLeft}>
+                                <Badge variant="neutral">{displayCode}</Badge>
+                                {semester && (
+                                    <Badge variant="neutral" className={styles.semesterBadge}>
+                                        {semester}
+                                    </Badge>
+                                )}
+                            </div>
+                            <span className={styles.university}>{universityAbbr}</span>
+                        </div>
 
-                <h3 className={styles.title} title={title}>{title}</h3>
+                        <h3 className={styles.title} title={title}>{title}</h3>
 
-                <div className={styles.meta}>
-                    <span className={styles.author}>av {author}</span>
-                    <span className={styles.pages}>{pages} sider</span>
-                    {fileSize && (
-                        <span className={styles.fileSize}>{formatFileSize(fileSize)}</span>
-                    )}
-                </div>
+                        <div className={styles.meta}>
+                            <span className={styles.author}>av {author}</span>
+                            <span className={styles.pages}>{pages} sider</span>
+                            {fileSize && (
+                                <span className={styles.fileSize}>{formatFileSize(fileSize)}</span>
+                            )}
+                        </div>
 
-                <div className={styles.footer}>
-                    <div className={styles.price}>{price},-</div>
-                    <div className={styles.viewCount}>
-                        <span className={styles.eye}>👁</span>
-                        <span>{viewCount ?? 0}</span>
-                    </div>
-                </div>
+                        <div className={styles.footer}>
+                            <div className={styles.price}>{price},-</div>
+                            <div className={styles.viewCount}>
+                                <span className={styles.eye}>👁</span>
+                                <span>{viewCount ?? 0}</span>
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
         </>
     );
 
+    const cardClassName = `${styles.card} ${viewMode === 'list' ? styles.listCard : ''} ${previewMode ? styles.previewCard : ''}`;
+
     if (previewMode) {
         return (
-            <div className={`${styles.card} ${styles.previewCard}`}>
+            <div className={cardClassName}>
                 {CardInner}
             </div>
         );
     }
 
     return (
-        <Link href={`/document/${id}`} className={styles.card}>
+        <Link href={`/document/${id}`} className={cardClassName}>
             {CardInner}
         </Link>
     );

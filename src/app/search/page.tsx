@@ -21,6 +21,12 @@ function SearchPageContent() {
     const [pendingUniversities, setPendingUniversities] = useState<string[]>([]);
     const [pendingCourseCodes, setPendingCourseCodes] = useState<string[]>([]);
     const [pendingTags, setPendingTags] = useState<string[]>([]);
+    const [pendingMinPages, setPendingMinPages] = useState('');
+    const [pendingMaxPages, setPendingMaxPages] = useState('');
+    const [pendingMinPrice, setPendingMinPrice] = useState('');
+    const [pendingMaxPrice, setPendingMaxPrice] = useState('');
+    const [pendingMinYear, setPendingMinYear] = useState('');
+    const [pendingMaxYear, setPendingMaxYear] = useState('');
     const [applyingFilters, setApplyingFilters] = useState(false);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [sortBy, setSortBy] = useState('newest');
@@ -67,6 +73,19 @@ function SearchPageContent() {
     useEffect(() => {
         fetchDocuments();
     }, []);
+
+    // Initialize pending state to match current state on mount
+    useEffect(() => {
+        setPendingUniversities(selectedUniversities);
+        setPendingCourseCodes(selectedCourseCodes);
+        setPendingTags(selectedTags);
+        setPendingMinPages(minPages);
+        setPendingMaxPages(maxPages);
+        setPendingMinPrice(minPrice);
+        setPendingMaxPrice(maxPrice);
+        setPendingMinYear(minYear);
+        setPendingMaxYear(maxYear);
+    }, []); // Only run on mount
 
     async function fetchDocuments() {
         const { data, error } = await supabase
@@ -148,12 +167,24 @@ function SearchPageContent() {
     const hasPendingChanges =
         !arraysEqual(selectedUniversities, pendingUniversities) ||
         !arraysEqual(selectedCourseCodes, pendingCourseCodes) ||
-        !arraysEqual(selectedTags, pendingTags);
+        !arraysEqual(selectedTags, pendingTags) ||
+        minPages !== pendingMinPages ||
+        maxPages !== pendingMaxPages ||
+        minPrice !== pendingMinPrice ||
+        maxPrice !== pendingMaxPrice ||
+        minYear !== pendingMinYear ||
+        maxYear !== pendingMaxYear;
 
     const applyPendingFilters = () => {
         setSelectedUniversities(pendingUniversities);
         setSelectedCourseCodes(pendingCourseCodes);
         setSelectedTags(pendingTags);
+        setMinPages(pendingMinPages);
+        setMaxPages(pendingMaxPages);
+        setMinPrice(pendingMinPrice);
+        setMaxPrice(pendingMaxPrice);
+        setMinYear(pendingMinYear);
+        setMaxYear(pendingMaxYear);
         setApplyingFilters(true);
         setTimeout(() => setApplyingFilters(false), 400);
     };
@@ -162,21 +193,39 @@ function SearchPageContent() {
         setPendingUniversities([]);
         setPendingCourseCodes([]);
         setPendingTags([]);
+        setPendingMinPages('');
+        setPendingMaxPages('');
+        setPendingMinPrice('');
+        setPendingMaxPrice('');
+        setPendingMinYear('');
+        setPendingMaxYear('');
     };
 
     const clearAllFilters = () => {
+        // Clear all filters
         setSelectedUniversities([]);
         setSelectedCourseCodes([]);
         setSelectedTags([]);
-        setPendingUniversities([]);
-        setPendingCourseCodes([]);
-        setPendingTags([]);
         setMinPages('');
         setMaxPages('');
         setMinPrice('');
         setMaxPrice('');
         setMinYear('');
         setMaxYear('');
+        setPendingUniversities([]);
+        setPendingCourseCodes([]);
+        setPendingTags([]);
+        setPendingMinPages('');
+        setPendingMaxPages('');
+        setPendingMinPrice('');
+        setPendingMaxPrice('');
+        setPendingMinYear('');
+        setPendingMaxYear('');
+        // Also clear search query
+        setSearchInput('');
+        setSearchQuery('');
+        setShowAutocomplete(false);
+        setSelectedAutocompleteIndex(-1);
         setApplyingFilters(true);
         setTimeout(() => setApplyingFilters(false), 300);
     };
@@ -397,7 +446,7 @@ function SearchPageContent() {
     };
 
     const hasActiveFilters = selectedUniversities.length > 0 || selectedCourseCodes.length > 0 || selectedTags.length > 0 ||
-        minPages || maxPages || minPrice || maxPrice || minYear || maxYear;
+        minPages || maxPages || minPrice || maxPrice || minYear || maxYear || searchQuery.trim().length > 0;
     const activeFilterCount = selectedUniversities.length + selectedCourseCodes.length + selectedTags.length +
         (minPages ? 1 : 0) + (maxPages ? 1 : 0) + (minPrice ? 1 : 0) + (maxPrice ? 1 : 0) + (minYear ? 1 : 0) + (maxYear ? 1 : 0);
 
@@ -426,7 +475,7 @@ function SearchPageContent() {
                                 onClick={clearAllFilters}
                                 disabled={!hasActiveFilters && !hasPendingChanges}
                             >
-                                Nullstill filtre
+                                Nullstill alt
                             </button>
                         </div>
 
@@ -482,11 +531,12 @@ function SearchPageContent() {
                                     <RangeSlider
                                         min={pageRange.min}
                                         max={pageRange.max}
-                                        minValue={minPages === '' ? '' : Number(minPages)}
-                                        maxValue={maxPages === '' ? '' : Number(maxPages)}
+                                        minValue={pendingMinPages === '' ? pageRange.min : Number(pendingMinPages)}
+                                        maxValue={pendingMaxPages === '' ? pageRange.max : Number(pendingMaxPages)}
                                         onChange={(min, max) => {
-                                            setMinPages(min === '' ? '' : String(min));
-                                            setMaxPages(max === '' ? '' : String(max));
+                                            // Update pending state, not active state
+                                            setPendingMinPages(min === pageRange.min ? '' : String(min));
+                                            setPendingMaxPages(max === pageRange.max ? '' : String(max));
                                         }}
                                         step={1}
                                         formatLabel={(value) => `${value} sider`}
@@ -501,11 +551,12 @@ function SearchPageContent() {
                                     <RangeSlider
                                         min={priceRange.min}
                                         max={priceRange.max}
-                                        minValue={minPrice === '' ? '' : Number(minPrice)}
-                                        maxValue={maxPrice === '' ? '' : Number(maxPrice)}
+                                        minValue={pendingMinPrice === '' ? priceRange.min : Number(pendingMinPrice)}
+                                        maxValue={pendingMaxPrice === '' ? priceRange.max : Number(pendingMaxPrice)}
                                         onChange={(min, max) => {
-                                            setMinPrice(min === '' ? '' : String(min));
-                                            setMaxPrice(max === '' ? '' : String(max));
+                                            // Update pending state, not active state
+                                            setPendingMinPrice(min === priceRange.min ? '' : String(min));
+                                            setPendingMaxPrice(max === priceRange.max ? '' : String(max));
                                         }}
                                         step={10}
                                         formatLabel={(value) => `${value} kr`}
@@ -520,13 +571,15 @@ function SearchPageContent() {
                                     <RangeSlider
                                         min={yearRange.min}
                                         max={yearRange.max}
-                                        minValue={minYear === '' ? '' : Number(minYear)}
-                                        maxValue={maxYear === '' ? '' : Number(maxYear)}
+                                        minValue={pendingMinYear === '' ? yearRange.min : Number(pendingMinYear)}
+                                        maxValue={pendingMaxYear === '' ? yearRange.max : Number(pendingMaxYear)}
                                         onChange={(min, max) => {
-                                            setMinYear(min === '' ? '' : String(min));
-                                            setMaxYear(max === '' ? '' : String(max));
+                                            // Update pending state, not active state
+                                            setPendingMinYear(min === yearRange.min ? '' : String(min));
+                                            setPendingMaxYear(max === yearRange.max ? '' : String(max));
                                         }}
                                         step={1}
+                                        allowTextInput={true}
                                     />
                                 </div>
 
@@ -568,25 +621,28 @@ function SearchPageContent() {
                                 {/* Search Bar */}
                                 <div className={styles.searchBarContainer} ref={searchBarRef}>
                                     <div className={styles.searchBar}>
-                                        <Search size={18} className={styles.searchIcon} />
-                                        <input
-                                            type="text"
-                                            placeholder="Søk etter fagkode, tema, eller nøkkelord..."
-                                            value={searchInput}
-                                            onChange={handleSearchInputChange}
-                                            onKeyDown={handleSearchKeyDown}
-                                            onFocus={() => setShowAutocomplete(true)}
-                                            className={styles.searchInput}
-                                        />
-                                        {searchInput && (
-                                            <button
-                                                onClick={clearSearch}
-                                                className={styles.clearSearch}
-                                                aria-label="Tøm søk"
-                                            >
-                                                ×
-                                            </button>
-                                        )}
+                                        <div className={styles.searchInputWrapper}>
+                                            <Search size={18} className={styles.searchIcon} />
+                                            <input
+                                                type="text"
+                                                placeholder="Søk etter fagkode, tema, eller nøkkelord..."
+                                                value={searchInput}
+                                                onChange={handleSearchInputChange}
+                                                onKeyDown={handleSearchKeyDown}
+                                                onFocus={() => setShowAutocomplete(true)}
+                                                className={styles.searchInput}
+                                            />
+                                            {searchInput && (
+                                                <button
+                                                    onClick={clearSearch}
+                                                    className={styles.clearSearch}
+                                                    aria-label="Tøm søk"
+                                                    type="button"
+                                                >
+                                                    ×
+                                                </button>
+                                            )}
+                                        </div>
                                         <button
                                             onClick={performSearch}
                                             className={styles.searchButton}
@@ -759,7 +815,7 @@ function SearchPageContent() {
                                     <>
                                         <p>Ingen dokumenter funnet med valgte filtre.</p>
                                         <button onClick={clearAllFilters} className={styles.clearButtonLarge}>
-                                            Nullstill filtre
+                                            Nullstill alt
                                         </button>
                                     </>
                                 ) : (
@@ -788,6 +844,7 @@ function SearchPageContent() {
                                         viewCount={doc.view_count}
                                         semester={doc.semester}
                                         fileSize={doc.file_size}
+                                        viewMode={viewMode}
                                     />
                                 ))}
                             </div>

@@ -31,7 +31,16 @@ export const SearchableFilter = ({
 
     // Enhanced search that matches both abbreviations and full names
     const filteredItems = useMemo(() => {
-        if (!searchQuery.trim()) return [];
+        // If no search query, show all items alphabetically sorted (will be scrollable)
+        if (!searchQuery.trim()) {
+            return items
+                .map(item => ({
+                    item,
+                    displayLabel: getDisplayLabel ? getDisplayLabel(item) : item
+                }))
+                .sort((a, b) => a.displayLabel.localeCompare(b.displayLabel, 'no', { sensitivity: 'base' }))
+                .map(item => item.item);
+        }
         
         const query = searchQuery.toLowerCase().trim();
         const keywords = query.split(/\s+/);
@@ -79,13 +88,17 @@ export const SearchableFilter = ({
             if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
                 setShowDropdown(false);
                 setSelectedIndex(-1);
+                setSearchQuery('');
             }
         };
 
         if (showDropdown) {
+            // Use both mousedown and click for better responsiveness
             document.addEventListener('mousedown', handleClickOutside);
+            document.addEventListener('click', handleClickOutside);
             return () => {
                 document.removeEventListener('mousedown', handleClickOutside);
+                document.removeEventListener('click', handleClickOutside);
             };
         }
     }, [showDropdown]);
@@ -97,9 +110,15 @@ export const SearchableFilter = ({
     };
 
     const handleInputFocus = () => {
-        if (searchQuery.trim()) {
-            setShowDropdown(true);
-        }
+        setShowDropdown(true);
+    };
+
+    const handleInputBlur = () => {
+        // Close dropdown when input loses focus (with small delay to allow click events)
+        setTimeout(() => {
+            setShowDropdown(false);
+            setSelectedIndex(-1);
+        }, 100);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -130,7 +149,7 @@ export const SearchableFilter = ({
         setSearchQuery('');
         setShowDropdown(false);
         setSelectedIndex(-1);
-        inputRef.current?.focus();
+        // Don't refocus input after selection - let it blur naturally
     };
 
     const handleRemoveSelected = (item: string, e: React.MouseEvent) => {
@@ -149,6 +168,7 @@ export const SearchableFilter = ({
                     value={searchQuery}
                     onChange={handleInputChange}
                     onFocus={handleInputFocus}
+                    onBlur={handleInputBlur}
                     onKeyDown={handleKeyDown}
                     className={styles.searchInput}
                 />
@@ -177,7 +197,7 @@ export const SearchableFilter = ({
             )}
 
             {/* Dropdown Results */}
-            {showDropdown && searchQuery.trim() && (
+            {showDropdown && (
                 <div className={styles.dropdown}>
                     {filteredItems.length > 0 ? (
                         filteredItems.map((item, index) => {
@@ -188,7 +208,14 @@ export const SearchableFilter = ({
                                     key={item}
                                     type="button"
                                     className={`${styles.dropdownItem} ${index === selectedIndex ? styles.dropdownItemActive : ''} ${isSelected ? styles.dropdownItemSelected : ''}`}
-                                    onClick={() => handleSelectItem(item)}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleSelectItem(item);
+                                    }}
+                                    onMouseDown={(e) => {
+                                        e.preventDefault(); // Prevent input blur before click
+                                    }}
                                     onMouseEnter={() => setSelectedIndex(index)}
                                     disabled={isSelected}
                                 >
@@ -197,9 +224,9 @@ export const SearchableFilter = ({
                                 </button>
                             );
                         })
-                    ) : (
+                    ) : searchQuery.trim() ? (
                         <div className={styles.noResults}>Ingen resultater</div>
-                    )}
+                    ) : null}
                 </div>
             )}
         </div>

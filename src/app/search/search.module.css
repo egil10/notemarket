@@ -19,11 +19,32 @@
 /* Sidebar */
 .sidebar {
     position: sticky;
-    top: 2rem;
-    height: fit-content;
+    top: calc(80px + 2rem); /* Header height (80px) + spacing (2rem) */
+    max-height: calc(100vh - 80px - 4rem); /* Viewport minus header and spacing */
+    overflow-y: auto;
+    overflow-x: hidden;
     background: var(--surface);
     border: 1px solid var(--border);
     padding: 1.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background-color: var(--text-muted);
 }
 
 .sidebarHeader {
@@ -409,7 +430,7 @@
 .list {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.5rem;
 }
 
 .loading,
@@ -462,6 +483,8 @@
     .sidebar {
         position: relative;
         top: 0;
+        left: auto;
+        width: 100%;
         max-height: none;
         overflow: visible;
     }
@@ -644,16 +667,24 @@
     gap: 0.5rem;
 }
 
+.searchInputWrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
 .searchIcon {
     position: absolute;
     left: 0.75rem;
     color: var(--text-muted);
     pointer-events: none;
+    z-index: 1;
 }
 
 .searchBar .searchInput {
-    flex: 1;
-    padding: 0.5rem 2.5rem 0.5rem 2.5rem;
+    width: 100%;
+    padding: 0.5rem 2.5rem 0.5rem 2.5rem; /* Left padding for icon, right padding for clear button */
     border: 1px solid var(--border-strong);
     background: var(--surface);
     font-size: 0.875rem;
@@ -674,9 +705,11 @@
 
 .clearSearch {
     position: absolute;
-    right: 0.5rem;
-    width: 24px;
-    height: 24px;
+    right: 0.75rem; /* Position inside input, on the right side */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -684,9 +717,11 @@
     border: none;
     color: var(--text-muted);
     cursor: pointer;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     line-height: 1;
     transition: color 0.2s ease;
+    z-index: 2;
+    padding: 0;
 }
 
 .clearSearch:hover {
