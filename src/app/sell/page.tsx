@@ -4,10 +4,12 @@ import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/Button';
 import { createClient } from '@/lib/supabase';
+import { useRouter } from 'next/navigation';
 import styles from './sell.module.css';
 
 export default function SellPage() {
     const supabase = createClient();
+    const router = useRouter();
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
@@ -19,32 +21,17 @@ export default function SellPage() {
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
 
-    // Auth State (Simple Email/Password for MVP)
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [isLogin, setIsLogin] = useState(true);
-
     useEffect(() => {
         checkUser();
     }, []);
 
     async function checkUser() {
         const { data: { user } } = await supabase.auth.getUser();
-        setUser(user);
-        setLoading(false);
-    }
-
-    async function handleAuth() {
-        setLoading(true);
-        if (isLogin) {
-            const { error } = await supabase.auth.signInWithPassword({ email, password });
-            if (error) alert(error.message);
+        if (!user) {
+            router.push('/login');
         } else {
-            const { error } = await supabase.auth.signUp({ email, password });
-            if (error) alert(error.message);
-            else alert('Check your email for the confirmation link!');
+            setUser(user);
         }
-        await checkUser();
         setLoading(false);
     }
 
@@ -95,6 +82,8 @@ export default function SellPage() {
 
     if (loading) return <div className={styles.page}>Loading...</div>;
 
+    if (!user) return null; // Will redirect
+
     return (
         <div className={styles.page}>
             <Header />
@@ -107,111 +96,83 @@ export default function SellPage() {
                         </p>
                     </div>
 
-                    {!user ? (
-                        <div className={styles.authCard}>
-                            <h2>{isLogin ? 'Logg inn for å selge' : 'Opprett konto'}</h2>
-                            <div className={styles.form}>
-                                <div className={styles.formGroup}>
-                                    <label>E-post</label>
+                    <div className={styles.uploadCard}>
+                        <div className={styles.dropzone}>
+                            <div className={styles.icon}>📄</div>
+                            {file ? (
+                                <h3>{file.name}</h3>
+                            ) : (
+                                <>
+                                    <h3>Dra og slipp filen din her</h3>
+                                    <p>eller</p>
                                     <input
-                                        type="email"
-                                        className={styles.input}
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        type="file"
+                                        onChange={(e) => setFile(e.target.files?.[0] || null)}
+                                        style={{ display: 'none' }}
+                                        id="file-upload"
                                     />
-                                </div>
-                                <div className={styles.formGroup}>
-                                    <label>Passord</label>
-                                    <input
-                                        type="password"
-                                        className={styles.input}
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                    />
-                                </div>
-                                <Button onClick={handleAuth} fullWidth>
-                                    {isLogin ? 'Logg inn' : 'Registrer deg'}
-                                </Button>
-                                <p className={styles.switchAuth} onClick={() => setIsLogin(!isLogin)}>
-                                    {isLogin ? 'Har du ikke konto? Registrer deg' : 'Har du konto? Logg inn'}
-                                </p>
-                            </div>
+                                    <Button
+                                        variant="secondary"
+                                        type="button"
+                                        onClick={() => document.getElementById('file-upload')?.click()}
+                                    >
+                                        Velg fil fra datamaskin
+                                    </Button>
+                                </>
+                            )}
                         </div>
-                    ) : (
-                        <div className={styles.uploadCard}>
-                            <div className={styles.dropzone}>
-                                <div className={styles.icon}>📄</div>
-                                {file ? (
-                                    <h3>{file.name}</h3>
-                                ) : (
-                                    <>
-                                        <h3>Dra og slipp filen din her</h3>
-                                        <p>eller</p>
-                                        <input
-                                            type="file"
-                                            onChange={(e) => setFile(e.target.files?.[0] || null)}
-                                            style={{ display: 'none' }}
-                                            id="file-upload"
-                                        />
-                                        <Button
-                                            variant="secondary"
-                                            type="button"
-                                            onClick={() => document.getElementById('file-upload')?.click()}
-                                        >
-                                            Velg fil fra datamaskin
-                                        </Button>
-                                    </>
-                                )}
+
+                        <div className={styles.form}>
+                            <div className={styles.formGroup}>
+                                <label>Tittel på dokumentet</label>
+                                <input
+                                    type="text"
+                                    className={styles.input}
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    placeholder="Eks: Sammendrag av JUS101"
+                                />
                             </div>
 
-                            <div className={styles.form}>
+                            <div className={styles.row}>
                                 <div className={styles.formGroup}>
-                                    <label>Tittel på dokumentet</label>
+                                    <label>Fagkode</label>
                                     <input
                                         type="text"
                                         className={styles.input}
-                                        value={title}
-                                        onChange={(e) => setTitle(e.target.value)}
+                                        value={courseCode}
+                                        onChange={(e) => setCourseCode(e.target.value)}
+                                        placeholder="Eks: JUS101"
                                     />
                                 </div>
-
-                                <div className={styles.row}>
-                                    <div className={styles.formGroup}>
-                                        <label>Fagkode</label>
-                                        <input
-                                            type="text"
-                                            className={styles.input}
-                                            value={courseCode}
-                                            onChange={(e) => setCourseCode(e.target.value)}
-                                        />
-                                    </div>
-                                    <div className={styles.formGroup}>
-                                        <label>Pris (NOK)</label>
-                                        <input
-                                            type="number"
-                                            className={styles.input}
-                                            value={price}
-                                            onChange={(e) => setPrice(e.target.value)}
-                                        />
-                                    </div>
-                                </div>
-
                                 <div className={styles.formGroup}>
-                                    <label>Beskrivelse</label>
-                                    <textarea
-                                        rows={4}
-                                        className={styles.textarea}
-                                        value={description}
-                                        onChange={(e) => setDescription(e.target.value)}
+                                    <label>Pris (NOK)</label>
+                                    <input
+                                        type="number"
+                                        className={styles.input}
+                                        value={price}
+                                        onChange={(e) => setPrice(e.target.value)}
+                                        placeholder="100"
                                     />
                                 </div>
-
-                                <Button fullWidth size="lg" onClick={handleUpload} disabled={uploading}>
-                                    {uploading ? 'Laster opp...' : 'Last opp og publiser'}
-                                </Button>
                             </div>
+
+                            <div className={styles.formGroup}>
+                                <label>Beskrivelse</label>
+                                <textarea
+                                    rows={4}
+                                    className={styles.textarea}
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    placeholder="Beskriv hva dokumentet inneholder..."
+                                />
+                            </div>
+
+                            <Button fullWidth size="lg" onClick={handleUpload} disabled={uploading}>
+                                {uploading ? 'Laster opp...' : 'Last opp og publiser'}
+                            </Button>
                         </div>
-                    )}
+                    </div>
                 </div>
             </main >
         </div >

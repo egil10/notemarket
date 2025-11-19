@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from './ui/Button';
+import Link from 'next/link';
 import styles from './Hero.module.css';
 
 export const Hero = () => {
@@ -24,8 +25,12 @@ export const Hero = () => {
                 </div>
 
                 <div className={styles.ctaGroup}>
-                    <Button variant="primary" size="lg">Kjøp dokumenter</Button>
-                    <Button variant="secondary" size="lg">Selg dokumenter</Button>
+                    <Link href="/search">
+                        <Button variant="primary" size="lg">Kjøp dokumenter</Button>
+                    </Link>
+                    <Link href="/sell">
+                        <Button variant="secondary" size="lg">Selg dokumenter</Button>
+                    </Link>
                 </div>
             </div>
         </section>

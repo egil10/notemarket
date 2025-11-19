@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Button } from './ui/Button';
+import { UserMenu } from './UserMenu';
 import styles from './Header.module.css';
 
 export const Header = () => {
@@ -18,9 +18,7 @@ export const Header = () => {
                 </nav>
 
                 <div className={styles.actions}>
-                    <Button variant="ghost" size="sm">Søk</Button>
-                    <Button variant="ghost" size="sm">Logg inn</Button>
-                    <Button variant="primary" size="sm">Bli medlem</Button>
+                    <UserMenu />
                 </div>
             </div>
         </header>
