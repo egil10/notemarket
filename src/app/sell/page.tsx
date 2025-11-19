@@ -147,14 +147,33 @@ export default function SellPage() {
                                     <>
                                         <h3>Dra og slipp filen din her</h3>
                                         <p>eller</p>
-                                        <label>Tittel på dokumentet</label>
                                         <input
-                                            type="text"
-                                            className={styles.input}
-                                            value={title}
-                                            onChange={(e) => setTitle(e.target.value)}
+                                            type="file"
+                                            onChange={(e) => setFile(e.target.files?.[0] || null)}
+                                            style={{ display: 'none' }}
+                                            id="file-upload"
                                         />
-                                    </div>
+                                        <Button
+                                            variant="secondary"
+                                            type="button"
+                                            onClick={() => document.getElementById('file-upload')?.click()}
+                                        >
+                                            Velg fil fra datamaskin
+                                        </Button>
+                                    </>
+                                )}
+                            </div>
+
+                            <div className={styles.form}>
+                                <div className={styles.formGroup}>
+                                    <label>Tittel på dokumentet</label>
+                                    <input
+                                        type="text"
+                                        className={styles.input}
+                                        value={title}
+                                        onChange={(e) => setTitle(e.target.value)}
+                                    />
+                                </div>
 
                                 <div className={styles.row}>
                                     <div className={styles.formGroup}>
@@ -194,7 +213,7 @@ export default function SellPage() {
                         </div>
                     )}
                 </div>
-            </main>
-        </div>
+            </main >
+        </div >
     );
 }
