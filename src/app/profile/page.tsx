@@ -61,6 +61,32 @@ export default function ProfilePage() {
         }
     }
 
+    async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+        if (!file || !user) return;
+
+        try {
+            // Upload to Supabase Storage
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${user.id}/avatar.${fileExt}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('avatars')
+                .upload(fileName, file, { upsert: true });
+
+            if (uploadError) throw uploadError;
+
+            // Get public URL
+            const { data: urlData } = supabase.storage
+                .from('avatars')
+                .getPublicUrl(fileName);
+
+            setAvatarUrl(urlData.publicUrl);
+        } catch (error: any) {
+            alert('Feil ved opplasting: ' + error.message);
+        }
+    }
+
     async function handleSave() {
         if (!user) return;
 
@@ -122,13 +148,25 @@ export default function ProfilePage() {
                                         />
                                     </div>
                                     <div className={styles.formGroup}>
-                                        <label>Avatar URL</label>
+                                        <label>Profilbilde</label>
                                         <input
-                                            type="text"
-                                            value={avatarUrl}
-                                            onChange={(e) => setAvatarUrl(e.target.value)}
-                                            placeholder="https://..."
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleAvatarChange}
                                         />
+                                        {avatarUrl && (
+                                            <img
+                                                src={avatarUrl}
+                                                alt="Preview"
+                                                style={{
+                                                    width: '80px',
+                                                    height: '80px',
+                                                    borderRadius: '50%',
+                                                    marginTop: '0.5rem',
+                                                    objectFit: 'cover'
+                                                }}
+                                            />
+                                        )}
                                     </div>
                                     <div className={styles.actions}>
                                         <Button onClick={handleSave}>Lagre</Button>

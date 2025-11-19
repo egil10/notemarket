@@ -13,6 +13,8 @@ export default function DocumentPage() {
     const [document, setDocument] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+    const [isOwner, setIsOwner] = useState(false);
+    const [currentUser, setCurrentUser] = useState<any>(null);
     const supabase = createClient();
 
     useEffect(() => {
@@ -22,6 +24,10 @@ export default function DocumentPage() {
     }, [params.id]);
 
     async function fetchDocument() {
+        // Get current user
+        const { data: { user } } = await supabase.auth.getUser();
+        setCurrentUser(user);
+
         const { data, error } = await supabase
             .from('documents')
             .select('*')
@@ -32,16 +38,42 @@ export default function DocumentPage() {
             console.error('Error fetching document:', error);
         } else {
             setDocument(data);
+            setIsOwner(user?.id === data.user_id);
+
             // Get signed URL for PDF
-            const { data: urlData } = await supabase.storage
+            const { data: urlData, error: urlError } = await supabase.storage
                 .from('documents')
                 .createSignedUrl(data.file_path, 3600); // 1 hour expiry
 
             if (urlData) {
                 setPdfUrl(urlData.signedUrl);
+            } else {
+                console.error('Error creating signed URL:', urlError);
             }
         }
         setLoading(false);
+    }
+
+    async function handleDownload() {
+        if (!document) return;
+
+        const { data, error } = await supabase.storage
+            .from('documents')
+            .download(document.file_path);
+
+        if (error) {
+            alert('Feil ved nedlasting: ' + error.message);
+        } else {
+            // Create a download link
+            const url = window.URL.createObjectURL(data);
+            const a = window.document.createElement('a');
+            a.href = url;
+            a.download = `${document.title}.pdf`;
+            window.document.body.appendChild(a);
+            a.click();
+            window.document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
     }
 
     if (loading) {
@@ -107,12 +139,25 @@ export default function DocumentPage() {
                             </div>
 
                             <div className={styles.actions}>
-                                <Button size="lg" fullWidth>
-                                    Kjøp dokument
-                                </Button>
-                                <p className={styles.disclaimer}>
-                                    Betaling kommer snart! Dette er en forhåndsvisning.
-                                </p>
+                                {isOwner ? (
+                                    <>
+                                        <Button size="lg" fullWidth onClick={handleDownload}>
+                                            Last ned ditt dokument
+                                        </Button>
+                                        <p className={styles.disclaimer}>
+                                            Dette er ditt dokument. Du kan laste det ned når som helst.
+                                        </p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Button size="lg" fullWidth>
+                                            Kjøp dokument
+                                        </Button>
+                                        <p className={styles.disclaimer}>
+                                            Betaling kommer snart! Dette er en forhåndsvisning.
+                                        </p>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>

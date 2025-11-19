@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/Button';
+import { SuccessModal } from '@/components/SuccessModal';
 import { createClient } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import styles from './sell.module.css';
@@ -14,6 +15,7 @@ export default function SellPage() {
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
     const [file, setFile] = useState<File | null>(null);
+    const [showSuccess, setShowSuccess] = useState(false);
 
     // Form State
     const [title, setTitle] = useState('');
@@ -66,7 +68,7 @@ export default function SellPage() {
 
             if (dbError) throw dbError;
 
-            alert('Dokument lastet opp!');
+            setShowSuccess(true);
             // Reset form
             setFile(null);
             setTitle('');
@@ -86,6 +88,12 @@ export default function SellPage() {
 
     return (
         <div className={styles.page}>
+            <SuccessModal
+                isOpen={showSuccess}
+                onClose={() => setShowSuccess(false)}
+                title="Gratulerer! 🎉"
+                message="Dokumentet ditt er nå publisert og tilgjengelig for salg!"
+            />
             <Header />
             <main className={styles.main}>
                 <div className={styles.container}>
