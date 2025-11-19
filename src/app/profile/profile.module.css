@@ -24,10 +24,16 @@
     border-radius: 1rem;
     padding: 2rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
     display: flex;
     gap: 2rem;
     align-items: flex-start;
     margin-bottom: 2rem;
+    transition: box-shadow 0.2s ease;
+}
+
+.profileCard:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .avatar {
@@ -40,6 +46,7 @@
     height: 120px;
     border-radius: 50%;
     object-fit: cover;
+    border: 3px solid #e5e7eb;
 }
 
 .avatarPlaceholder {
@@ -83,23 +90,30 @@
 .formGroup label {
     display: block;
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: 600;
     color: #374151;
     margin-bottom: 0.5rem;
 }
 
 .formGroup input {
     width: 100%;
-    padding: 0.75rem;
+    padding: 0.75rem 1rem;
     border: 1px solid #d1d5db;
     border-radius: 0.5rem;
     font-size: 1rem;
+    transition: all 0.2s ease;
+    background: white;
 }
 
 .formGroup input:focus {
     outline: none;
     border-color: #2563eb;
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.formGroup input[type="file"] {
+    padding: 0.5rem;
+    cursor: pointer;
 }
 
 .actions {
@@ -120,7 +134,14 @@
     border-radius: 1rem;
     padding: 1.5rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
     text-align: center;
+    transition: all 0.2s ease;
+}
+
+.stat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .statValue {
@@ -129,12 +150,14 @@
     font-weight: 700;
     color: #2563eb;
     margin-bottom: 0.5rem;
+    font-family: var(--font-outfit);
 }
 
 .statLabel {
     display: block;
     font-size: 0.875rem;
     color: #6b7280;
+    font-weight: 500;
 }
 
 .section {
@@ -142,6 +165,7 @@
     border-radius: 1rem;
     padding: 2rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
 }
 
 .section h2 {
@@ -156,6 +180,10 @@
     text-align: center;
     padding: 3rem 2rem;
     color: #6b7280;
+}
+
+.empty p {
+    margin: 0.5rem 0;
 }
 
 .grid {
