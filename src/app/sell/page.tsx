@@ -27,6 +27,7 @@ export default function SellPage() {
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
     const [pageCount, setPageCount] = useState('');
+    const [tags, setTags] = useState('');
 
     useEffect(() => {
         checkUser();
@@ -71,6 +72,7 @@ export default function SellPage() {
                     user_id: user.id,
                     file_size: file.size,
                     page_count: pageCount ? parseInt(pageCount) : null,
+                    tags: tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : [],
                 });
 
             if (dbError) throw dbError;
@@ -84,6 +86,7 @@ export default function SellPage() {
             setPrice('');
             setDescription('');
             setPageCount('');
+            setTags('');
         } catch (error: any) {
             showToast('Error uploading: ' + error.message, 'error');
         } finally {
@@ -199,6 +202,20 @@ export default function SellPage() {
                                         min="1"
                                     />
                                 </div>
+                            </div>
+
+                            <div className={styles.formGroup}>
+                                <label>
+                                    Tags (valgfritt)
+                                    <span className={styles.hint} title="Legg til tags for å gjøre dokumentet lettere å finne. Skill tags med komma."> ℹ️</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    className={styles.input}
+                                    value={tags}
+                                    onChange={(e) => setTags(e.target.value)}
+                                    placeholder="statistikk, R, programmering"
+                                />
                             </div>
 
                             <div className={styles.formGroup}>

@@ -42,13 +42,38 @@ export function sanitizeFilename(text: string): string {
 }
 
 export function generateDocumentFilename(
-    courseCode: string,
     title: string,
+    courseCode: string,
+    university: string,
     username: string
 ): string {
-    const sanitizedCourseCode = sanitizeFilename(courseCode.toUpperCase());
-    const sanitizedTitle = sanitizeFilename(title);
-    const sanitizedUsername = sanitizeFilename(username);
+    const parts: string[] = [];
 
-    return `${sanitizedCourseCode}_${sanitizedTitle}_${sanitizedUsername}.pdf`;
+    // Add title (required)
+    if (title) {
+        parts.push(sanitizeFilename(title));
+    }
+
+    // Add university abbreviation (optional)
+    if (university) {
+        const abbr = getUniversityAbbreviation(university);
+        parts.push(sanitizeFilename(abbr));
+    }
+
+    // Add course code (optional)
+    if (courseCode) {
+        parts.push(sanitizeFilename(courseCode.toUpperCase()));
+    }
+
+    // Add timestamp (YYYY-MM-DD-HH-MM)
+    const now = new Date();
+    const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}`;
+    parts.push(timestamp);
+
+    // Add username (required)
+    if (username) {
+        parts.push(sanitizeFilename(username));
+    }
+
+    return parts.join('_') + '.pdf';
 }
