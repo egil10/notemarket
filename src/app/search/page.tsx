@@ -26,7 +26,8 @@ export default function SearchPage() {
     const [maxPages, setMaxPages] = useState('');
     const [minPrice, setMinPrice] = useState('');
     const [maxPrice, setMaxPrice] = useState('');
-    const [year, setYear] = useState('');
+    const [minYear, setMinYear] = useState('');
+    const [maxYear, setMaxYear] = useState('');
     const supabase = createClient();
 
     useEffect(() => {
@@ -102,7 +103,8 @@ export default function SearchPage() {
         setMaxPages('');
         setMinPrice('');
         setMaxPrice('');
-        setYear('');
+        setMinYear('');
+        setMaxYear('');
         setApplyingFilters(true);
         setTimeout(() => setApplyingFilters(false), 300);
     };
@@ -160,7 +162,9 @@ export default function SearchPage() {
                 (!maxPrice || docPrice <= parseFloat(maxPrice));
             
             // Year filter
-            const matchesYear = !year || new Date(doc.created_at).getFullYear().toString() === year;
+            const docYear = doc.year ? parseInt(doc.year) : null;
+            const matchesYear = (!minYear || !docYear || docYear >= parseInt(minYear)) &&
+                (!maxYear || !docYear || docYear <= parseInt(maxYear));
             
             return matchesUniversity && matchesCourseCode && matchesTags && 
                    matchesPages && matchesPrice && matchesYear;
@@ -183,7 +187,7 @@ export default function SearchPage() {
         }
 
         return filtered;
-    }, [documents, selectedUniversities, selectedCourseCodes, selectedTags, sortBy, minPages, maxPages, minPrice, maxPrice, year]);
+    }, [documents, selectedUniversities, selectedCourseCodes, selectedTags, sortBy, minPages, maxPages, minPrice, maxPrice, minYear, maxYear]);
 
     const toggleUniversity = (uni: string) => {
         togglePending(uni, setPendingUniversities);
@@ -198,9 +202,9 @@ export default function SearchPage() {
     };
 
     const hasActiveFilters = selectedUniversities.length > 0 || selectedCourseCodes.length > 0 || selectedTags.length > 0 ||
-        minPages || maxPages || minPrice || maxPrice || year;
+        minPages || maxPages || minPrice || maxPrice || minYear || maxYear;
     const activeFilterCount = selectedUniversities.length + selectedCourseCodes.length + selectedTags.length +
-        (minPages ? 1 : 0) + (maxPages ? 1 : 0) + (minPrice ? 1 : 0) + (maxPrice ? 1 : 0) + (year ? 1 : 0);
+        (minPages ? 1 : 0) + (maxPages ? 1 : 0) + (minPrice ? 1 : 0) + (maxPrice ? 1 : 0) + (minYear ? 1 : 0) + (maxYear ? 1 : 0);
 
     return (
         <div className={styles.page}>
@@ -276,7 +280,6 @@ export default function SearchPage() {
                                             className={styles.rangeInput}
                                             min="0"
                                         />
-                                        <span className={styles.rangeSeparator}>-</span>
                                         <input
                                             type="number"
                                             placeholder="Maks"
@@ -303,7 +306,6 @@ export default function SearchPage() {
                                             min="0"
                                             step="1"
                                         />
-                                        <span className={styles.rangeSeparator}>-</span>
                                         <input
                                             type="number"
                                             placeholder="Maks"
@@ -321,18 +323,26 @@ export default function SearchPage() {
                                     <div className={styles.filterTitle}>
                                         <span>År</span>
                                     </div>
-                                    <select
-                                        value={year}
-                                        onChange={(e) => setYear(e.target.value)}
-                                        className={styles.yearSelect}
-                                    >
-                                        <option value="">Alle år</option>
-                                        {Array.from({ length: 11 }, (_, i) => 2025 - i).map((yr) => (
-                                            <option key={yr} value={yr.toString()}>
-                                                {yr}
-                                            </option>
-                                        ))}
-                                    </select>
+                                    <div className={styles.rangeInputs}>
+                                        <input
+                                            type="number"
+                                            placeholder="Fra"
+                                            value={minYear}
+                                            onChange={(e) => setMinYear(e.target.value)}
+                                            className={styles.rangeInput}
+                                            min="2000"
+                                            max="2030"
+                                        />
+                                        <input
+                                            type="number"
+                                            placeholder="Til"
+                                            value={maxYear}
+                                            onChange={(e) => setMaxYear(e.target.value)}
+                                            className={styles.rangeInput}
+                                            min="2000"
+                                            max="2030"
+                                        />
+                                    </div>
                                 </div>
 
                                 {/* Tags Filter */}
@@ -472,12 +482,21 @@ export default function SearchPage() {
                                             <span>×</span>
                                         </button>
                                     )}
-                                    {year && (
+                                    {minYear && (
                                         <button
                                             className={styles.filterChip}
-                                            onClick={() => setYear('')}
+                                            onClick={() => setMinYear('')}
                                         >
-                                            År {year}
+                                            Fra {minYear}
+                                            <span>×</span>
+                                        </button>
+                                    )}
+                                    {maxYear && (
+                                        <button
+                                            className={styles.filterChip}
+                                            onClick={() => setMaxYear('')}
+                                        >
+                                            Til {maxYear}
                                             <span>×</span>
                                         </button>
                                     )}

@@ -67,7 +67,7 @@
 
 .dropzone:hover {
     border-color: var(--accent);
-    background: rgba(59, 130, 246, 0.05);
+    background: var(--surface-alt);
 }
 
 .icon {
@@ -85,8 +85,8 @@
     position: absolute;
     top: 1rem;
     right: 1rem;
-    background: #d94e28;
-    color: white;
+    background: var(--accent);
+    color: var(--surface);
     padding: 0.25rem 0.75rem;
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -182,7 +182,7 @@
 }
 
 .required {
-    color: #d94e28;
+    color: var(--accent);
     font-weight: 700;
     margin-left: 0.25rem;
 }
@@ -296,7 +296,7 @@
 
 .dropzone:hover {
     border-color: var(--accent);
-    background: rgba(59, 130, 246, 0.05);
+    background: var(--surface-alt);
 }
 
 .icon {
@@ -364,6 +364,41 @@
 .textarea:focus {
     outline: none;
     border-color: var(--primary);
+}
+
+.priceBreakdown {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.earningsRow,
+.platformRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.earningsLabel,
+.platformLabel {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.earningsAmount {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.platformAmount {
+    color: var(--error);
+    font-weight: 600;
 }
 
 .hint {

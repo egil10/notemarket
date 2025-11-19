@@ -32,7 +32,6 @@ export const ThemeToggle = () => {
             aria-label={label}
           />
           <label htmlFor={`theme-${value}`} className={styles.option}>
-            <span className="sr-only">{label}</span>
             <Icon aria-hidden size={18} />
           </label>
         </span>

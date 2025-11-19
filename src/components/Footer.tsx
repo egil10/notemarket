@@ -8,44 +8,86 @@ export const Footer = () => {
     return (
         <footer className={styles.footer}>
             <div className={styles.container}>
-                <div className={styles.topRow}>
-                    <Link href="/" className={styles.brand}>
-                        <Image
-                            src="/logos/logo-nm-svg.drawio.svg"
-                            alt="NoteMarket logo"
-                            width={110}
-                            height={32}
-                            className={styles.brandMark}
-                        />
-                        <span>NoteMarket</span>
-                    </Link>
-                    <div className={styles.linkGrid}>
-                        <Link href="/statistikk" className={styles.link}>
-                            Statistikk
+                {/* Top Section: Main Links */}
+                <div className={styles.topSection}>
+                    <div className={styles.brandColumn}>
+                        <Link href="/" className={styles.brand}>
+                            <Image
+                                src="/logos/logo-nm-svg.drawio.svg"
+                                alt="NoteMarket logo"
+                                width={110}
+                                height={32}
+                                className={styles.brandMark}
+                            />
+                            <span className={styles.brandText}>NoteMarket</span>
                         </Link>
-                        <span className={styles.text}>Om oss</span>
-                        <a href="mailto:notemarket.no@gmail.com" className={styles.link}>
-                            notemarket.no@gmail.com
-                        </a>
-                        <span className={styles.text}>Vilkår</span>
-                        <span className={styles.text}>Personvern</span>
-                        <a 
-                            href="https://github.com/egil10/notemarket" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className={styles.link}
-                        >
-                            <Github size={16} />
-                            <span>GitHub</span>
-                        </a>
+                    </div>
+
+                    <div className={styles.linksGrid}>
+                        <div className={styles.linkColumn}>
+                            <h3 className={styles.columnHeading}>Produkt</h3>
+                            <nav className={styles.linkList}>
+                                <Link href="/statistikk" className={styles.link}>
+                                    Statistikk
+                                </Link>
+                            </nav>
+                        </div>
+
+                        <div className={styles.linkColumn}>
+                            <h3 className={styles.columnHeading}>Selskap</h3>
+                            <nav className={styles.linkList}>
+                                <Link href="/om-oss" className={styles.link}>
+                                    Om oss
+                                </Link>
+                                <a href="mailto:notemarket.no@gmail.com" className={styles.link}>
+                                    notemarket.no@gmail.com
+                                </a>
+                            </nav>
+                        </div>
+
+                        <div className={styles.linkColumn}>
+                            <h3 className={styles.columnHeading}>Juridisk</h3>
+                            <nav className={styles.linkList}>
+                                <Link href="/vilkar" className={styles.link}>
+                                    Vilkår
+                                </Link>
+                                <Link href="/personvern" className={styles.link}>
+                                    Personvern
+                                </Link>
+                            </nav>
+                        </div>
+
+                        <div className={styles.linkColumn}>
+                            <h3 className={styles.columnHeading}>Følg oss</h3>
+                            <nav className={styles.linkList}>
+                                <a 
+                                    href="https://github.com/egil10/notemarket" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className={styles.link}
+                                >
+                                    <Github size={18} />
+                                    <span>GitHub</span>
+                                </a>
+                            </nav>
+                        </div>
                     </div>
                 </div>
-                <div className={styles.bottomRow}>
-                    <div className={styles.tagline}>Norges største markedsplass for studiemateriale</div>
+
+                {/* Divider */}
+                <div className={styles.divider}></div>
+
+                {/* Bottom Section: Tagline, Copyright, Theme Toggle */}
+                <div className={styles.bottomSection}>
+                    <div className={styles.tagline}>
+                        Norges største markedsplass for studiemateriale
+                    </div>
                     <div className={styles.copyright}>
                         © {new Date().getFullYear()} NoteMarket. Alle rettigheter reservert.
                     </div>
-                    <ThemeToggle />
+                    <div className={styles.themeToggleWrapper}>
+                        <ThemeToggle />
+                    </div>
                 </div>
             </div>
         </footer>

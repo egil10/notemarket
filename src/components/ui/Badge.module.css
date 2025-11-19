@@ -19,15 +19,15 @@
 }
 
 .success {
-    background-color: #f0fdf4;
-    color: #15803d;
-    border-color: #15803d;
+    background-color: var(--success-bg);
+    color: var(--success-text);
+    border-color: var(--success);
 }
 
 .warning {
-    background-color: #fefce8;
-    color: #a16207;
-    border-color: #a16207;
+    background-color: var(--warning-bg);
+    color: var(--warning-text);
+    border-color: var(--warning);
 }
 
 .neutral {

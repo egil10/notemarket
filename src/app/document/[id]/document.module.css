@@ -62,9 +62,9 @@
 
 .lockedBadge {
     padding: 0.25rem 0.75rem;
-    background: rgba(217, 78, 40, 0.1);
-    border: 1px solid #d94e28;
-    color: #d94e28;
+    background: var(--error-bg);
+    border: 1px solid var(--accent);
+    color: var(--accent);
     font-weight: 600;
     border-radius: var(--radius-sm);
     text-transform: uppercase;
@@ -81,7 +81,7 @@
 .pageFrame {
     position: relative;
     border: 1px solid var(--border);
-    background: #f5f5f5;
+    background: var(--surface-alt);
     aspect-ratio: 210 / 297;
     min-height: 520px;
     overflow: hidden;
@@ -94,7 +94,7 @@
     top: 10px;
     right: 10px;
     background: rgba(0, 0, 0, 0.7);
-    color: white;
+    color: var(--surface);
     padding: 0.4rem 0.8rem;
     border-radius: var(--radius-sm);
     font-size: 0.8rem;
@@ -110,7 +110,7 @@
 
 .lockedPanel {
     border: 2px dashed var(--border);
-    background: rgba(0, 0, 0, 0.03);
+    background: var(--surface-alt);
     display: flex;
     flex-direction: column;
     align-items: center;

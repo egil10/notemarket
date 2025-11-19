@@ -47,36 +47,36 @@
 }
 
 .success {
-    background: #ecfdf5;
-    border-color: #10b981;
-    color: #065f46;
+    background: var(--success-bg);
+    border-color: var(--success);
+    color: var(--success-text);
 }
 
 .success .icon {
-    background: #10b981;
-    color: white;
+    background: var(--success);
+    color: var(--surface);
 }
 
 .error {
-    background: #fef2f2;
-    border-color: #ef4444;
-    color: #991b1b;
+    background: var(--error-bg);
+    border-color: var(--error);
+    color: var(--error-text);
 }
 
 .error .icon {
-    background: #ef4444;
-    color: white;
+    background: var(--error);
+    color: var(--surface);
 }
 
 .info {
-    background: #eff6ff;
-    border-color: #3b82f6;
-    color: #1e40af;
+    background: var(--info-bg);
+    border-color: var(--info);
+    color: var(--info-text);
 }
 
 .info .icon {
-    background: #3b82f6;
-    color: white;
+    background: var(--info);
+    color: var(--surface);
 }
 
 @media (max-width: 640px) {

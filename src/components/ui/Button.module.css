@@ -37,8 +37,9 @@
 }
 
 .secondary:hover:not(:disabled) {
-    background-color: var(--text-main);
+    background-color: var(--primary);
     color: var(--surface);
+    border-color: var(--primary);
     transform: translateY(-1px);
     box-shadow: var(--shadow-hover);
 }
@@ -60,7 +61,7 @@
 }
 
 .ghost:hover:not(:disabled) {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: var(--surface-alt);
     color: var(--text-main);
 }
 

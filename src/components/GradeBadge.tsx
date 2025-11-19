@@ -21,9 +21,9 @@ export const GradeBadge = ({ grade, verified, size = 'medium' }: GradeBadgeProps
         <div className={`${styles.badge} ${getGradeClass()} ${styles[size]}`}>
             <span className={styles.letter}>{grade?.toUpperCase()}</span>
             {verified ? (
-                <CheckCircle className={styles.verified} size={size === 'small' ? 14 : size === 'large' ? 20 : 16} />
+                <CheckCircle className={styles.verified} size={size === 'small' ? 14 : size === 'large' ? 24 : 20} />
             ) : (
-                <Clock className={styles.pending} size={size === 'small' ? 14 : size === 'large' ? 20 : 16} />
+                <Clock className={styles.pending} size={size === 'small' ? 14 : size === 'large' ? 24 : 20} />
             )}
         </div>
     );

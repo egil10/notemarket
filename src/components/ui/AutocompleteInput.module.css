@@ -41,7 +41,7 @@
     top: calc(100% + 0.25rem);
     left: 0;
     right: 0;
-    background: #ffffff;
+    background: var(--surface);
     border: 1px solid var(--border-strong);
     border-radius: 4px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -59,12 +59,12 @@
     background: transparent;
     width: 100%;
     text-align: left;
-    color: #1a1a1a;
+    color: var(--text-main);
 }
 
 .option:hover,
 .option.highlighted {
-    background-color: #f0f0ed;
+    background-color: var(--surface-alt);
 }
 
 .noResults {

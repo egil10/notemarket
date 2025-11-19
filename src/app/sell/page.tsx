@@ -409,6 +409,22 @@ export default function SellPage() {
                                             placeholder="100"
                                             min={0}
                                         />
+                                        {price && parseFloat(price) > 0 && (
+                                            <div className={styles.priceBreakdown}>
+                                                <div className={styles.earningsRow}>
+                                                    <span className={styles.earningsLabel}>Du tjener:</span>
+                                                    <span className={styles.earningsAmount}>
+                                                        {Math.round(parseFloat(price) * 0.85).toLocaleString('nb-NO')} kr
+                                                    </span>
+                                                </div>
+                                                <div className={styles.platformRow}>
+                                                    <span className={styles.platformLabel}>NoteMarket tjener:</span>
+                                                    <span className={styles.platformAmount}>
+                                                        {Math.round(parseFloat(price) * 0.15).toLocaleString('nb-NO')} kr
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 

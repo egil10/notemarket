@@ -51,7 +51,7 @@ export const DocumentCard = ({
                 </div>
                 {grade && (
                     <div className={styles.gradeBadgeOverlay}>
-                        <GradeBadge grade={grade} verified={gradeVerified} size="small" />
+                        <GradeBadge grade={grade} verified={gradeVerified} size="medium" />
                     </div>
                 )}
                 <div className={styles.overlay}>

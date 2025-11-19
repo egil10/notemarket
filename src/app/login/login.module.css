@@ -3,15 +3,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #f9fafb;
+    background-color: var(--background);
     padding: 1rem;
 }
 
 .card {
-    background: white;
+    background: var(--surface);
     padding: 2.5rem;
     border-radius: 1rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-hover);
     width: 100%;
     max-width: 480px;
 }
@@ -19,7 +19,7 @@
 .title {
     font-size: 1.875rem;
     font-weight: 700;
-    color: #111827;
+    color: var(--text-main);
     text-align: center;
     margin-bottom: 0.5rem;
     font-family: var(--font-outfit);
@@ -27,7 +27,7 @@
 
 .subtitle {
     text-align: center;
-    color: #6b7280;
+    color: var(--text-muted);
     margin-bottom: 2rem;
 }
 
@@ -46,21 +46,23 @@
 .formGroup label {
     font-size: 0.875rem;
     font-weight: 500;
-    color: #374151;
+    color: var(--text-main);
 }
 
 .formGroup input {
     padding: 0.75rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--border);
     border-radius: 0.5rem;
     font-size: 1rem;
     transition: border-color 0.2s;
+    background: var(--surface);
+    color: var(--text-main);
 }
 
 .formGroup input:focus {
     outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(26, 71, 49, 0.1);
 }
 
 .passwordField {
@@ -79,14 +81,14 @@
     right: 0.75rem;
     background: none;
     border: none;
-    color: #6b7280;
+    color: var(--text-muted);
     cursor: pointer;
     display: flex;
     align-items: center;
 }
 
 .passwordToggle:hover {
-    color: #111827;
+    color: var(--text-main);
 }
 
 .passwordRequirements {
@@ -101,19 +103,19 @@
     display: flex;
     align-items: center;
     gap: 0.35rem;
-    color: #9ca3af;
+    color: var(--text-muted);
 }
 
 .requirement svg {
-    color: #dc2626;
+    color: var(--error);
 }
 
 .requirementMet {
-    color: #065f46;
+    color: var(--success-text);
 }
 
 .requirementMet svg {
-    color: #10b981;
+    color: var(--success);
 }
 
 .divider {
@@ -123,7 +125,7 @@
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 0.2em;
-    color: #9ca3af;
+    color: var(--text-muted);
 }
 
 .divider::before,
@@ -131,7 +133,7 @@
     content: '';
     flex: 1;
     height: 1px;
-    background: #e5e7eb;
+    background: var(--border);
 }
 
 .divider span {
@@ -144,18 +146,19 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--border);
     border-radius: 0.5rem;
     padding: 0.75rem;
     font-weight: 600;
-    background: white;
+    background: var(--surface);
+    color: var(--text-main);
     cursor: pointer;
     transition: background 0.2s, border-color 0.2s;
 }
 
 .googleButton:hover {
-    background: #f9fafb;
-    border-color: #9ca3af;
+    background: var(--surface-alt);
+    border-color: var(--border-strong);
 }
 
 .googleButton:disabled {
@@ -164,16 +167,16 @@
 }
 
 .error {
-    background-color: #fee2e2;
-    color: #991b1b;
+    background-color: var(--error-bg);
+    color: var(--error-text);
     padding: 0.75rem;
     border-radius: 0.5rem;
     font-size: 0.875rem;
 }
 
 .success {
-    background-color: #dcfce7;
-    color: #166534;
+    background-color: var(--success-bg);
+    color: var(--success-text);
     padding: 0.75rem;
     border-radius: 0.5rem;
     font-size: 0.875rem;
@@ -183,13 +186,13 @@
     margin-top: 2rem;
     text-align: center;
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--text-muted);
 }
 
 .switchButton {
     background: none;
     border: none;
-    color: #2563eb;
+    color: var(--primary);
     font-weight: 600;
     cursor: pointer;
     margin-left: 0.5rem;
@@ -203,11 +206,11 @@
 .backLink {
     display: block;
     margin-top: 1.5rem;
-    color: #6b7280;
+    color: var(--text-muted);
     text-decoration: none;
     transition: color 0.2s;
 }
 
 .backLink:hover {
-    color: #111827;
+    color: var(--text-main);
 }
