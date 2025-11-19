@@ -1,9 +1,100 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/Button';
+import { createClient } from '@/lib/supabase';
 import styles from './sell.module.css';
 
 export default function SellPage() {
+    const supabase = createClient();
+    const [user, setUser] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [uploading, setUploading] = useState(false);
+    const [file, setFile] = useState<File | null>(null);
+
+    // Form State
+    const [title, setTitle] = useState('');
+    const [courseCode, setCourseCode] = useState('');
+    const [price, setPrice] = useState('');
+    const [description, setDescription] = useState('');
+
+    // Auth State (Simple Email/Password for MVP)
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [isLogin, setIsLogin] = useState(true);
+
+    useEffect(() => {
+        checkUser();
+    }, []);
+
+    async function checkUser() {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+        setLoading(false);
+    }
+
+    async function handleAuth() {
+        setLoading(true);
+        if (isLogin) {
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) alert(error.message);
+        } else {
+            const { error } = await supabase.auth.signUp({ email, password });
+            if (error) alert(error.message);
+            else alert('Check your email for the confirmation link!');
+        }
+        await checkUser();
+        setLoading(false);
+    }
+
+    async function handleUpload() {
+        if (!file || !user) return;
+        setUploading(true);
+
+        try {
+            // 1. Upload File
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random()}.${fileExt}`;
+            const filePath = `${user.id}/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('documents')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            // 2. Insert Metadata
+            const { error: dbError } = await supabase
+                .from('documents')
+                .insert({
+                    title,
+                    course_code: courseCode,
+                    price: parseFloat(price),
+                    description,
+                    file_path: filePath,
+                    user_id: user.id,
+                    university: 'Unknown' // Placeholder
+                });
+
+            if (dbError) throw dbError;
+
+            alert('Dokument lastet opp!');
+            // Reset form
+            setFile(null);
+            setTitle('');
+            setCourseCode('');
+            setPrice('');
+            setDescription('');
+        } catch (error: any) {
+            alert('Error uploading: ' + error.message);
+        } finally {
+            setUploading(false);
+        }
+    }
+
+    if (loading) return <div className={styles.page}>Loading...</div>;
+
     return (
         <div className={styles.page}>
             <Header />
@@ -12,44 +103,111 @@ export default function SellPage() {
                     <div className={styles.header}>
                         <h1 className={styles.title}>Selg dine dokumenter</h1>
                         <p className={styles.subtitle}>
-                            Last opp notater, sammendrag eller eksamensbesvarelser og tjen penger hver gang noen laster dem ned.
+                            Last opp notater, sammendrag eller eksamensbesvarelser og tjen penger.
                         </p>
                     </div>
 
-                    <div className={styles.uploadCard}>
-                        <div className={styles.dropzone}>
-                            <div className={styles.icon}>📄</div>
-                            <h3>Dra og slipp filen din her</h3>
-                            <p>eller</p>
-                            <Button variant="secondary">Velg fil fra datamaskin</Button>
-                            <p className={styles.hint}>Støtter PDF, DOCX (Maks 50MB)</p>
-                        </div>
-
-                        <div className={styles.form}>
-                            <div className={styles.formGroup}>
-                                <label>Tittel på dokumentet</label>
-                                <input type="text" placeholder="Eks: Sammendrag av Exphil" className={styles.input} />
-                            </div>
-
-                            <div className={styles.row}>
+                    {!user ? (
+                        <div className={styles.authCard}>
+                            <h2>{isLogin ? 'Logg inn for å selge' : 'Opprett konto'}</h2>
+                            <div className={styles.form}>
                                 <div className={styles.formGroup}>
-                                    <label>Fagkode</label>
-                                    <input type="text" placeholder="Eks: EXPHIL03" className={styles.input} />
+                                    <label>E-post</label>
+                                    <input
+                                        type="email"
+                                        className={styles.input}
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                    />
                                 </div>
                                 <div className={styles.formGroup}>
-                                    <label>Pris (NOK)</label>
-                                    <input type="number" placeholder="100" className={styles.input} />
+                                    <label>Passord</label>
+                                    <input
+                                        type="password"
+                                        className={styles.input}
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                    />
                                 </div>
+                                <Button onClick={handleAuth} fullWidth>
+                                    {isLogin ? 'Logg inn' : 'Registrer deg'}
+                                </Button>
+                                <p className={styles.switchAuth} onClick={() => setIsLogin(!isLogin)}>
+                                    {isLogin ? 'Har du ikke konto? Registrer deg' : 'Har du konto? Logg inn'}
+                                </p>
                             </div>
-
-                            <div className={styles.formGroup}>
-                                <label>Beskrivelse</label>
-                                <textarea rows={4} placeholder="Beskriv hva dokumentet inneholder..." className={styles.textarea} />
-                            </div>
-
-                            <Button fullWidth size="lg">Last opp og publiser</Button>
                         </div>
-                    </div>
+                    ) : (
+                        <div className={styles.uploadCard}>
+                            <div className={styles.dropzone}>
+                                <div className={styles.icon}>📄</div>
+                                {file ? (
+                                    <h3>{file.name}</h3>
+                                ) : (
+                                    <>
+                                        <h3>Dra og slipp filen din her</h3>
+                                        <p>eller</p>
+                                        <input
+                                            type="file"
+                                            onChange={(e) => setFile(e.target.files?.[0] || null)}
+                                            style={{ display: 'none' }}
+                                            id="file-upload"
+                                        />
+                                        <label htmlFor="file-upload">
+                                            <Button variant="secondary" as="span">Velg fil fra datamaskin</Button>
+                                        </label>
+                                    </>
+                                )}
+                            </div>
+
+                            <div className={styles.form}>
+                                <div className={styles.formGroup}>
+                                    <label>Tittel på dokumentet</label>
+                                    <input
+                                        type="text"
+                                        className={styles.input}
+                                        value={title}
+                                        onChange={(e) => setTitle(e.target.value)}
+                                    />
+                                </div>
+
+                                <div className={styles.row}>
+                                    <div className={styles.formGroup}>
+                                        <label>Fagkode</label>
+                                        <input
+                                            type="text"
+                                            className={styles.input}
+                                            value={courseCode}
+                                            onChange={(e) => setCourseCode(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className={styles.formGroup}>
+                                        <label>Pris (NOK)</label>
+                                        <input
+                                            type="number"
+                                            className={styles.input}
+                                            value={price}
+                                            onChange={(e) => setPrice(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className={styles.formGroup}>
+                                    <label>Beskrivelse</label>
+                                    <textarea
+                                        rows={4}
+                                        className={styles.textarea}
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}
+                                    />
+                                </div>
+
+                                <Button fullWidth size="lg" onClick={handleUpload} disabled={uploading}>
+                                    {uploading ? 'Laster opp...' : 'Last opp og publiser'}
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </main>
         </div>
