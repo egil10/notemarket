@@ -1,0 +1,42 @@
+.page {
+    min-height: 100vh;
+    background-color: var(--background);
+}
+
+.featuredSection {
+    padding: 4rem 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 2rem;
+}
+
+.sectionHeader h2 {
+    font-size: 2rem;
+    color: var(--primary);
+}
+
+.viewAll {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.viewAll:hover {
+    text-decoration: underline;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+}

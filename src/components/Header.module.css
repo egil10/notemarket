@@ -1,0 +1,66 @@
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--background);
+    border-bottom: 1px solid var(--border-strong);
+    height: 80px;
+    display: flex;
+    align-items: center;
+}
+
+.container {
+    max-width: 1400px;
+    /* Wider container for modern feel */
+    margin: 0 auto;
+    padding: 0 40px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    font-family: var(--font-outfit);
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--primary);
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+    /* Swiss style often uses uppercase logos */
+}
+
+.nav {
+    display: flex;
+    gap: 2.5rem;
+    align-items: center;
+}
+
+.link {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-main);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: opacity 0.2s ease;
+}
+
+.link:hover {
+    opacity: 0.6;
+}
+
+.actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .nav {
+        display: none;
+    }
+
+    .container {
+        padding: 0 20px;
+    }
+}

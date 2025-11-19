@@ -1,0 +1,96 @@
+.hero {
+    padding: 8rem 0;
+    background-color: var(--background);
+    border-bottom: 1px solid var(--border);
+}
+
+.content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 4rem;
+    align-items: start;
+}
+
+.title {
+    font-size: 5rem;
+    color: var(--primary);
+    line-height: 0.9;
+    margin-bottom: 2rem;
+    letter-spacing: -0.04em;
+    font-weight: 700;
+}
+
+.highlight {
+    color: var(--accent);
+    background: none;
+    -webkit-text-fill-color: initial;
+    font-style: italic;
+    /* Academic touch */
+}
+
+.subtitle {
+    font-size: 1.5rem;
+    color: var(--text-main);
+    max-width: 500px;
+    line-height: 1.4;
+    margin-bottom: 3rem;
+    font-weight: 400;
+}
+
+.searchContainer {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    gap: 0;
+    /* Connected input and button */
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    box-shadow: 8px 8px 0px rgba(0, 0, 0, 1);
+    /* Retro shadow */
+    border-radius: var(--radius-sm);
+}
+
+.searchInput {
+    flex: 1;
+    border: none;
+    padding: 1.5rem;
+    font-size: 1.1rem;
+    outline: none;
+    font-family: var(--font-inter);
+    color: var(--text-main);
+    background: transparent;
+}
+
+.searchButton {
+    border-radius: 0;
+    background: var(--primary);
+    color: var(--surface);
+    padding: 0 3rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-left: 1px solid var(--border-strong);
+}
+
+.searchButton:hover {
+    background: var(--primary-dark);
+}
+
+.ctaGroup {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .title {
+        font-size: 3.5rem;
+    }
+}
