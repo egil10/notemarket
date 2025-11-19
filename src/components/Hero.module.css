@@ -40,17 +40,24 @@
     font-weight: 400;
 }
 
+.actionRow {
+    display: flex;
+    gap: 1.5rem;
+    align-items: stretch;
+    flex-wrap: wrap;
+}
+
 .searchContainer {
     width: 100%;
+    min-width: 280px;
     max-width: 100%;
     display: flex;
     gap: 0;
-    /* Connected input and button */
     background: var(--surface);
     border: 1px solid var(--border-strong);
     box-shadow: 8px 8px 0px rgba(0, 0, 0, 1);
-    /* Retro shadow */
     border-radius: var(--radius-sm);
+    flex: 1;
 }
 
 .searchInput {
@@ -77,6 +84,14 @@
     padding: 0 3rem;
 }
 
+.ctaGroup {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1rem;
+    min-width: 220px;
+}
+
 .ctaButton {
     border: 1px solid var(--border-strong);
     box-shadow: 8px 8px 0 rgba(0, 0, 0, 1);
@@ -92,12 +107,6 @@
 .ctaButtonSecondary {
     background: var(--surface);
     color: var(--text-main);
-}
-
-.ctaGroup {
-    display: flex;
-    gap: 1rem;
-    margin-top: 2rem;
 }
 
 @media (max-width: 1024px) {

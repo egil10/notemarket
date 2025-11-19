@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Github } from 'lucide-react';
+import { ThemeToggle } from './ThemeToggle';
 import styles from './Footer.module.css';
 
 export const Footer = () => {
@@ -10,10 +11,10 @@ export const Footer = () => {
                 <div className={styles.brandRow}>
                     <Link href="/" className={styles.brand}>
                         <Image
-                            src="/logos/logo-nm-32-32.drawio.png"
+                            src="/logos/logo-nm-svg.drawio.svg"
                             alt="NoteMarket logo"
-                            width={70}
-                            height={30}
+                            width={110}
+                            height={32}
                             className={styles.brandMark}
                         />
                         <span>NoteMarket</span>
@@ -22,6 +23,7 @@ export const Footer = () => {
                 </div>
 
                 <div className={styles.links}>
+                    <ThemeToggle />
                     <Link href="/statistikk" className={styles.link}>
                         Statistikk
                     </Link>

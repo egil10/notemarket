@@ -15,34 +15,36 @@ export const Hero = () => {
                     Alt er skrevet av og for studenter. Bli en del av Norges største kunnskapsportal.
                 </p>
 
-                <div className={styles.searchContainer}>
-                    <input
-                        type="text"
-                        placeholder="Søk etter fagkode (f.eks. JUS101) eller tema..."
-                        className={styles.searchInput}
-                    />
-                    <Button size="lg" className={`${styles.heroButton} ${styles.searchButton}`}>Søk</Button>
-                </div>
+                <div className={styles.actionRow}>
+                    <div className={styles.searchContainer}>
+                        <input
+                            type="text"
+                            placeholder="Søk etter fagkode (f.eks. JUS101) eller tema..."
+                            className={styles.searchInput}
+                        />
+                        <Button size="lg" className={`${styles.heroButton} ${styles.searchButton}`}>Søk</Button>
+                    </div>
 
-                <div className={styles.ctaGroup}>
-                    <Link href="/search">
-                        <Button
-                            variant="primary"
-                            size="lg"
-                            className={`${styles.heroButton} ${styles.ctaButton}`}
-                        >
-                            Kjøp dokumenter
-                        </Button>
-                    </Link>
-                    <Link href="/sell">
-                        <Button
-                            variant="secondary"
-                            size="lg"
-                            className={`${styles.heroButton} ${styles.ctaButton} ${styles.ctaButtonSecondary}`}
-                        >
-                            Selg dokumenter
-                        </Button>
-                    </Link>
+                    <div className={styles.ctaGroup}>
+                        <Link href="/search">
+                            <Button
+                                variant="primary"
+                                size="lg"
+                                className={`${styles.heroButton} ${styles.ctaButton}`}
+                            >
+                                Kjøp dokumenter
+                            </Button>
+                        </Link>
+                        <Link href="/sell">
+                            <Button
+                                variant="secondary"
+                                size="lg"
+                                className={`${styles.heroButton} ${styles.ctaButton} ${styles.ctaButtonSecondary}`}
+                            >
+                                Selg dokumenter
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
             </div>
         </section>

@@ -1,0 +1,28 @@
+.root {
+  display: inline-flex;
+  gap: 0.25rem;
+  border: 1px solid var(--border);
+  padding: 0.35rem;
+  align-items: center;
+}
+
+.root input {
+  display: none;
+}
+
+.option {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.root input:checked + .option {
+  border-color: var(--text-main);
+  color: var(--text-main);
+}
+

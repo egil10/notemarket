@@ -44,8 +44,11 @@ export default function DocumentPage() {
             setDocument(data);
             setIsOwner(user?.id === data.user_id);
 
-            // Increment view count (fire-and-forget)
-            supabase.rpc('increment_document_views', { doc_id: data.id }).catch(console.error);
+            // Increment view count (fire-and-forget style with await to satisfy TS)
+            const { error: viewError } = await supabase.rpc('increment_document_views', { doc_id: data.id });
+            if (viewError) {
+                console.error('Feil ved increment_document_views:', viewError);
+            }
 
             // Get signed URL for PDF
             const { data: urlData, error: urlError } = await supabase.storage

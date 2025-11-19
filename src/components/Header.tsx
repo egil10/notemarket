@@ -10,9 +10,9 @@ export const Header = () => {
             <div className={styles.container}>
                 <Link href="/" className={styles.logo}>
                     <Image
-                        src="/logos/logo-nm-32-32.drawio.png"
+                        src="/logos/logo-nm-svg.drawio.svg"
                         alt="NoteMarket logo"
-                        width={64}
+                        width={90}
                         height={28}
                         priority
                         className={styles.logoMark}

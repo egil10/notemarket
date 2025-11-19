@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Outfit, Inter } from "next/font/google";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import { ToastProvider } from "@/components/ToastProvider";
 import { Footer } from "@/components/Footer";
 import "./globals.css";
@@ -20,8 +21,12 @@ export const metadata: Metadata = {
   title: "NoteMarket | Kjøp og selg studiemateriale",
   description: "Norges beste markedsplass for studienotater og eksamensbesvarelser.",
   icons: {
-    icon: "/logos/logo-nm-32-32.drawio.png",
-    shortcut: "/logos/logo-nm-32-32.drawio.png",
+    icon: [
+      { url: "/logos/logo-nm-svg.drawio.svg", type: "image/svg+xml" },
+      { url: "/logos/logo-nm-32-32.drawio.png", sizes: "32x32", type: "image/png" },
+      { url: "/logos/logo-nm-16-16.drawio.png", sizes: "16x16", type: "image/png" },
+    ],
+    shortcut: "/logos/logo-nm-svg.drawio.svg",
     apple: "/logos/logo-nm-180-180.drawio.png",
     other: [
       { rel: "android-chrome", url: "/logos/logo-nm-192-192.drawio.png" },
@@ -38,10 +43,12 @@ export default function RootLayout({
   return (
     <html lang="no" suppressHydrationWarning>
       <body className={`${outfit.variable} ${inter.variable}`}>
-        <ToastProvider>
-          {children}
-          <Footer />
-        </ToastProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <ToastProvider>
+            {children}
+            <Footer />
+          </ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
