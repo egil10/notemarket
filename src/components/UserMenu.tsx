@@ -1,64 +1,92 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase';
-import { Button } from './ui/Button';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
+import styles from './UserMenu.module.css';
 
 export const UserMenu = () => {
     const [user, setUser] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
+    const [username, setUsername] = useState<string>('');
+    const [showDropdown, setShowDropdown] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
     const supabase = createClient();
     const router = useRouter();
 
     useEffect(() => {
-        const getUser = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            setUser(user);
-            setLoading(false);
+        checkUser();
+
+        // Close dropdown when clicking outside
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setShowDropdown(false);
+            }
         };
 
-        getUser();
-
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null);
-        });
-
-        return () => subscription.unsubscribe();
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleLogout = async () => {
+    async function checkUser() {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+
+        if (user) {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('username')
+                .eq('id', user.id)
+                .single();
+
+            if (profile) {
+                setUsername(profile.username);
+            }
+        }
+    }
+
+    async function handleLogout() {
         await supabase.auth.signOut();
-        router.refresh();
-        setUser(null);
-    };
+        window.location.href = '/'; // Hard refresh to home
+    }
 
-    if (loading) return null;
-
-    if (user) {
+    if (!user) {
         return (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <Link href="/profile" style={{ textDecoration: 'none' }}>
-                    <span style={{ fontSize: '0.875rem', fontWeight: 500, color: '#111827', cursor: 'pointer' }}>
-                        Hei, {user.user_metadata?.username || user.email?.split('@')[0]}
-                    </span>
+            <div className={styles.menu}>
+                <Link href="/login">
+                    <button className={styles.loginButton}>Logg inn</button>
                 </Link>
-                <Button variant="ghost" size="sm" onClick={handleLogout}>
-                    Logg ut
-                </Button>
+                <Link href="/login">
+                    <button className={styles.signupButton}>Bli medlem</button>
+                </Link>
             </div>
         );
     }
 
     return (
-        <>
-            <Link href="/login">
-                <Button variant="ghost" size="sm">Logg inn</Button>
-            </Link>
-            <Link href="/login">
-                <Button variant="primary" size="sm">Bli medlem</Button>
-            </Link>
-        </>
+        <div className={styles.menu} ref={dropdownRef}>
+            <button
+                className={styles.profileButton}
+                onClick={() => setShowDropdown(!showDropdown)}
+            >
+                Profil
+            </button>
+
+            {showDropdown && (
+                <div className={styles.dropdown}>
+                    <div className={styles.greeting}>
+                        Hei, {username || 'Bruker'}!
+                    </div>
+                    <Link href="/profile" onClick={() => setShowDropdown(false)}>
+                        <div className={styles.dropdownItem}>
+                            Profil
+                        </div>
+                    </Link>
+                    <div className={styles.dropdownItem} onClick={handleLogout}>
+                        Logg ut
+                    </div>
+                </div>
+            )}
+        </div>
     );
 };

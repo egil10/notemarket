@@ -35,47 +35,45 @@
 .filters {
     background: var(--surface);
     border: 1px solid var(--border);
-    padding: 1.5rem;
+    padding: 2rem;
     margin-bottom: 2rem;
-    display: flex;
-    gap: 1rem;
-    align-items: flex-end;
-    flex-wrap: wrap;
 }
 
-.filterGroup {
-    flex: 1;
-    min-width: 200px;
+.filterSection {
+    margin-bottom: 1.5rem;
 }
 
-.filterGroup label {
+.filterSection:last-of-type {
+    margin-bottom: 0;
+}
+
+.filterLabel {
     display: block;
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--text-main);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
-.filterSelect {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--border-strong);
-    background: var(--surface);
-    font-size: 1rem;
-    font-family: var(--font-inter);
-    cursor: pointer;
-    transition: all 0.1s ease;
+.tagGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
-.filterSelect:focus {
-    outline: none;
-    border-color: var(--primary);
+.filterActions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
 }
 
 .clearButton {
-    padding: 0.75rem 1.5rem;
+    padding: 0.5rem 1.5rem;
     background: transparent;
     border: 1px solid var(--border-strong);
     font-size: 0.875rem;
@@ -83,7 +81,6 @@
     color: var(--text-main);
     cursor: pointer;
     transition: all 0.1s ease;
-    white-space: nowrap;
     font-family: var(--font-inter);
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -115,11 +112,9 @@
 }
 
 .resultCount {
-    padding: 0.75rem 1rem;
     font-size: 0.875rem;
     font-weight: 500;
     color: var(--text-muted);
-    white-space: nowrap;
 }
 
 .loading,
@@ -145,12 +140,13 @@
     }
 
     .filters {
-        flex-direction: column;
-        align-items: stretch;
+        padding: 1.5rem;
     }
 
-    .filterGroup {
-        min-width: 100%;
+    .filterActions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
     }
 
     .clearButton {

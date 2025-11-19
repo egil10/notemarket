@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Header } from '@/components/Header';
 import { DocumentCard } from '@/components/DocumentCard';
+import { FilterTag } from '@/components/ui/FilterTag';
 import { createClient } from '@/lib/supabase';
 import { getUniversityAbbreviation } from '@/lib/universities';
 import styles from './search.module.css';
@@ -10,8 +11,8 @@ import styles from './search.module.css';
 export default function SearchPage() {
     const [documents, setDocuments] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedUniversity, setSelectedUniversity] = useState<string>('');
-    const [selectedCourseCode, setSelectedCourseCode] = useState<string>('');
+    const [selectedUniversities, setSelectedUniversities] = useState<string[]>([]);
+    const [selectedCourseCodes, setSelectedCourseCodes] = useState<string[]>([]);
     const supabase = createClient();
 
     useEffect(() => {
@@ -51,18 +52,32 @@ export default function SearchPage() {
     // Filter documents based on selected filters
     const filteredDocuments = useMemo(() => {
         return documents.filter(doc => {
-            const matchesUniversity = !selectedUniversity || doc.university === selectedUniversity;
-            const matchesCourseCode = !selectedCourseCode || doc.course_code === selectedCourseCode;
+            const matchesUniversity = selectedUniversities.length === 0 ||
+                selectedUniversities.includes(doc.university);
+            const matchesCourseCode = selectedCourseCodes.length === 0 ||
+                selectedCourseCodes.includes(doc.course_code);
             return matchesUniversity && matchesCourseCode;
         });
-    }, [documents, selectedUniversity, selectedCourseCode]);
+    }, [documents, selectedUniversities, selectedCourseCodes]);
 
-    const clearFilters = () => {
-        setSelectedUniversity('');
-        setSelectedCourseCode('');
+    const toggleUniversity = (uni: string) => {
+        setSelectedUniversities(prev =>
+            prev.includes(uni) ? prev.filter(u => u !== uni) : [...prev, uni]
+        );
     };
 
-    const hasActiveFilters = selectedUniversity || selectedCourseCode;
+    const toggleCourseCode = (code: string) => {
+        setSelectedCourseCodes(prev =>
+            prev.includes(code) ? prev.filter(c => c !== code) : [...prev, code]
+        );
+    };
+
+    const clearFilters = () => {
+        setSelectedUniversities([]);
+        setSelectedCourseCodes([]);
+    };
+
+    const hasActiveFilters = selectedUniversities.length > 0 || selectedCourseCodes.length > 0;
 
     return (
         <div className={styles.page}>
@@ -79,46 +94,43 @@ export default function SearchPage() {
                     {/* Filters */}
                     {!loading && documents.length > 0 && (
                         <div className={styles.filters}>
-                            <div className={styles.filterGroup}>
-                                <label>Universitet</label>
-                                <select
-                                    value={selectedUniversity}
-                                    onChange={(e) => setSelectedUniversity(e.target.value)}
-                                    className={styles.filterSelect}
-                                >
-                                    <option value="">Alle universiteter</option>
+                            <div className={styles.filterSection}>
+                                <label className={styles.filterLabel}>Universitet</label>
+                                <div className={styles.tagGrid}>
                                     {universities.map((uni) => (
-                                        <option key={uni} value={uni}>
-                                            {getUniversityAbbreviation(uni)}
-                                        </option>
+                                        <FilterTag
+                                            key={uni}
+                                            label={getUniversityAbbreviation(uni)}
+                                            active={selectedUniversities.includes(uni)}
+                                            onClick={() => toggleUniversity(uni)}
+                                        />
                                     ))}
-                                </select>
+                                </div>
                             </div>
 
-                            <div className={styles.filterGroup}>
-                                <label>Fagkode</label>
-                                <select
-                                    value={selectedCourseCode}
-                                    onChange={(e) => setSelectedCourseCode(e.target.value)}
-                                    className={styles.filterSelect}
-                                >
-                                    <option value="">Alle fagkoder</option>
+                            <div className={styles.filterSection}>
+                                <label className={styles.filterLabel}>Fagkode</label>
+                                <div className={styles.tagGrid}>
                                     {courseCodes.map((code) => (
-                                        <option key={code} value={code}>
-                                            {code}
-                                        </option>
+                                        <FilterTag
+                                            key={code}
+                                            label={code}
+                                            active={selectedCourseCodes.includes(code)}
+                                            onClick={() => toggleCourseCode(code)}
+                                        />
                                     ))}
-                                </select>
+                                </div>
                             </div>
 
-                            {hasActiveFilters && (
-                                <button onClick={clearFilters} className={styles.clearButton}>
-                                    Nullstill filtre
-                                </button>
-                            )}
-
-                            <div className={styles.resultCount}>
-                                {filteredDocuments.length} dokument{filteredDocuments.length !== 1 ? 'er' : ''}
+                            <div className={styles.filterActions}>
+                                {hasActiveFilters && (
+                                    <button onClick={clearFilters} className={styles.clearButton}>
+                                        Nullstill filtre
+                                    </button>
+                                )}
+                                <div className={styles.resultCount}>
+                                    {filteredDocuments.length} dokument{filteredDocuments.length !== 1 ? 'er' : ''}
+                                </div>
                             </div>
                         </div>
                     )}
@@ -152,7 +164,7 @@ export default function SearchPage() {
                                     university={doc.university || 'Ukjent'}
                                     courseCode={doc.course_code || 'N/A'}
                                     price={doc.price}
-                                    pages={0}
+                                    pages={doc.page_count || 0}
                                     type="Dokument"
                                     rating={0}
                                 />

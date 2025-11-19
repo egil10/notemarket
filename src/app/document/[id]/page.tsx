@@ -83,8 +83,9 @@ export default function DocumentPage() {
         } else {
             // Create a download link with smart filename
             const filename = generateDocumentFilename(
-                document.course_code || 'DOCUMENT',
                 document.title,
+                document.course_code || '',
+                document.university || '',
                 username
             );
 

@@ -33,8 +33,8 @@ export default function LoginPage() {
                     password,
                 });
                 if (error) throw error;
-                router.push('/sell'); // Redirect to sell page after login
-                router.refresh();
+                // Hard refresh to home page
+                window.location.href = '/';
             } else {
                 // Sign Up with metadata
                 const { error } = await supabase.auth.signUp({

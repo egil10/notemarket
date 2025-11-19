@@ -1,0 +1,31 @@
+.tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    font-family: var(--font-inter);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.tag:hover {
+    border-color: var(--border-strong);
+    background: var(--surface-alt);
+}
+
+.tag.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--surface);
+}
+
+.tag.active:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+}

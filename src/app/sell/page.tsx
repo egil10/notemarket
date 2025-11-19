@@ -26,6 +26,7 @@ export default function SellPage() {
     const [university, setUniversity] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
+    const [pageCount, setPageCount] = useState('');
 
     useEffect(() => {
         checkUser();
@@ -68,6 +69,8 @@ export default function SellPage() {
                     description,
                     file_path: filePath,
                     user_id: user.id,
+                    file_size: file.size,
+                    page_count: pageCount ? parseInt(pageCount) : null,
                 });
 
             if (dbError) throw dbError;
@@ -77,8 +80,10 @@ export default function SellPage() {
             setFile(null);
             setTitle('');
             setCourseCode('');
+            setUniversity('');
             setPrice('');
             setDescription('');
+            setPageCount('');
         } catch (error: any) {
             showToast('Error uploading: ' + error.message, 'error');
         } finally {
@@ -181,6 +186,17 @@ export default function SellPage() {
                                         value={price}
                                         onChange={(e) => setPrice(e.target.value)}
                                         placeholder="100"
+                                    />
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label>Antall sider</label>
+                                    <input
+                                        type="number"
+                                        className={styles.input}
+                                        value={pageCount}
+                                        onChange={(e) => setPageCount(e.target.value)}
+                                        placeholder="10"
+                                        min="1"
                                     />
                                 </div>
                             </div>
