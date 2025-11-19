@@ -137,15 +137,13 @@
     border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    will-change: transform, box-shadow;
 }
 
 .carouselButton:hover:not(:disabled) {
-    background: var(--surface-alt);
+    background: var(--primary);
     border-color: var(--primary);
-    color: var(--primary);
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(26, 71, 49, 0.2);
+    color: var(--surface);
+    box-shadow: 0 4px 12px rgba(26, 71, 49, 0.3);
 }
 
 .carouselButton:active:not(:disabled) {

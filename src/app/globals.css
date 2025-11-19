@@ -126,51 +126,9 @@ select:focus,
 textarea:focus {
   outline: none;
   border-color: var(--primary);
-  transform: translateY(-1px);
+  background: var(--surface-alt);
+  box-shadow: 0 0 0 3px rgba(26, 71, 49, 0.1);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* High-FPS Animations & Micro-interactions */
-@media (prefers-reduced-motion: no-preference) {
-  * {
-    /* Enable GPU acceleration for smooth animations */
-    will-change: auto;
-  }
-
-  /* Smooth transitions for interactive elements */
-  button,
-  a,
-  input,
-  select,
-  textarea {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  /* Button hover effects */
-  button:hover:not(:disabled),
-  a:hover {
-    transform: translateY(-2px);
-  }
-
-  button:active:not(:disabled),
-  a:active {
-    transform: translateY(0);
-    transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  /* Card hover effects */
-  [class*="card"]:hover,
-  [class*="Card"]:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-  }
-
-  /* Input focus animations */
-  input:focus,
-  select:focus,
-  textarea:focus {
-    box-shadow: 0 0 0 3px rgba(26, 71, 49, 0.1);
-  }
 }
 
 /* Smooth page transitions */
@@ -210,7 +168,7 @@ textarea:focus {
   }
 }
 
-/* Apply animations to main content */
+/* Apply fade-in to main content only */
 main {
   animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
