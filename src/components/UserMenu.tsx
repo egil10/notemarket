@@ -76,16 +76,13 @@ export const UserMenu = () => {
 
             {showDropdown && (
                 <div className={styles.dropdown}>
-                    <div className={styles.greeting}>
-                        Hei, {greetingName}!
-                    </div>
                     <Link href="/profile" onClick={() => setShowDropdown(false)}>
                         <div className={styles.dropdownItem}>
-                            PROFILE
+                            Profil
                         </div>
                     </Link>
                     <div className={styles.dropdownItem} onClick={handleLogout}>
-                        LOGOUT
+                        Logg ut
                     </div>
                 </div>
             )}

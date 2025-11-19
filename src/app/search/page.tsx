@@ -21,7 +21,6 @@ export default function SearchPage() {
     const [applyingFilters, setApplyingFilters] = useState(false);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [sortBy, setSortBy] = useState('newest');
-    const [chartCourse, setChartCourse] = useState<string | null>(null);
     const supabase = createClient();
 
     useEffect(() => {
@@ -41,8 +40,6 @@ export default function SearchPage() {
         }
         setLoading(false);
     }
-
-    const yearsRange = useMemo(() => Array.from({ length: 11 }, (_, idx) => 2015 + idx), []);
 
     // Get unique values for filters
     const { universities, courseCodes, tags } = useMemo(() => {
@@ -162,50 +159,6 @@ export default function SearchPage() {
         return filtered;
     }, [documents, selectedUniversities, selectedCourseCodes, selectedTags, sortBy]);
 
-    const courseYearCounts = useMemo(() => {
-        const map = new Map<string, Map<number, number>>();
-        documents.forEach(doc => {
-            const course = doc.course_code?.toUpperCase() || 'UKJENT';
-            const createdYear = new Date(doc.created_at).getFullYear();
-            if (createdYear < 2015 || createdYear > 2025) return;
-            if (!map.has(course)) {
-                map.set(course, new Map());
-            }
-            const yearMap = map.get(course)!;
-            yearMap.set(createdYear, (yearMap.get(createdYear) || 0) + 1);
-        });
-        return map;
-    }, [documents]);
-
-    const topCourseFallback = useMemo(() => {
-        const counts = new Map<string, number>();
-        documents.forEach(doc => {
-            const course = doc.course_code?.toUpperCase() || 'UKJENT';
-            counts.set(course, (counts.get(course) || 0) + 1);
-        });
-        const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]);
-        return sorted[0]?.[0] || null;
-    }, [documents]);
-
-    useEffect(() => {
-        if (selectedCourseCodes.length > 0) {
-            setChartCourse(selectedCourseCodes[0]);
-        } else if (!chartCourse && topCourseFallback) {
-            setChartCourse(topCourseFallback);
-        }
-    }, [selectedCourseCodes, topCourseFallback, chartCourse]);
-
-    const chartSeries = useMemo(() => {
-        if (!chartCourse) return [];
-        const yearMap = courseYearCounts.get(chartCourse) || new Map<number, number>();
-        return yearsRange.map(year => ({
-            year,
-            value: yearMap.get(year) || 0,
-        }));
-    }, [chartCourse, courseYearCounts, yearsRange]);
-
-    const chartMax = Math.max(...chartSeries.map(item => item.value), 1);
-
     const toggleUniversity = (uni: string) => {
         togglePending(uni, setPendingUniversities);
     };
@@ -243,14 +196,10 @@ export default function SearchPage() {
                             </button>
                             <button
                                 className={styles.secondaryButton}
-                                onClick={clearPendingFilters}
-                                disabled={
-                                    pendingUniversities.length === 0 &&
-                                    pendingCourseCodes.length === 0 &&
-                                    pendingTags.length === 0
-                                }
+                                onClick={clearAllFilters}
+                                disabled={!hasActiveFilters && !hasPendingChanges}
                             >
-                                Nullstill valg
+                                Nullstill filtre
                             </button>
                         </div>
 
@@ -313,10 +262,6 @@ export default function SearchPage() {
                                 )}
                             </>
                         )}
-
-                        <button onClick={clearAllFilters} className={styles.clearButton}>
-                            Nullstill alle filtre
-                        </button>
                     </aside>
 
                     {/* Main Content */}
@@ -400,50 +345,6 @@ export default function SearchPage() {
                                 </div>
                             </div>
                         )}
-
-                        <section className={styles.chartPanel}>
-                            <div className={styles.chartHeader}>
-                                <div>
-                                    <p className={styles.chartEyebrow}>Historikk 2015–2025</p>
-                                    <h2>Dokumenter per år</h2>
-                                </div>
-                                <div className={styles.chartSelect}>
-                                    <label htmlFor="chart-course">Fagkode</label>
-                                    <select
-                                        id="chart-course"
-                                        value={chartCourse || ''}
-                                        onChange={(e) => setChartCourse(e.target.value || null)}
-                                    >
-                                        <option value="">Velg fagkode</option>
-                                        {courseCodes.map((code) => (
-                                            <option key={code} value={code}>
-                                                {code}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-
-                            {chartCourse && chartSeries.length > 0 ? (
-                                <div className={styles.barChart}>
-                                    {chartSeries.map(({ year, value }) => (
-                                        <div key={year} className={styles.barColumn}>
-                                            <div
-                                                className={styles.bar}
-                                                style={{ height: `${(value / chartMax) * 100}%` }}
-                                            >
-                                                <span>{value}</span>
-                                            </div>
-                                            <p>{year}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className={styles.placeholder}>
-                                    Velg en fagkode for å se historiske opplastinger.
-                                </div>
-                            )}
-                        </section>
 
                         {loading ? (
                             <div className={styles.loading}>Laster dokumenter...</div>

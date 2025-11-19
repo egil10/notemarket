@@ -41,23 +41,19 @@
 }
 
 .actionRow {
-    display: flex;
-    gap: 1.5rem;
+    display: grid;
+    grid-template-columns: minmax(320px, 1.6fr) minmax(180px, 0.7fr) minmax(180px, 0.7fr);
+    gap: 1rem;
     align-items: stretch;
-    flex-wrap: wrap;
 }
 
 .searchContainer {
-    width: 100%;
-    min-width: 280px;
-    max-width: 100%;
     display: flex;
     gap: 0;
     background: var(--surface);
     border: 1px solid var(--border-strong);
     box-shadow: 8px 8px 0px rgba(0, 0, 0, 1);
-    border-radius: var(--radius-sm);
-    flex: 1;
+    border-radius: 0;
 }
 
 .searchInput {
@@ -85,11 +81,9 @@
 }
 
 .ctaGroup {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 1rem;
-    min-width: 220px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
 }
 
 .ctaButton {
@@ -117,5 +111,13 @@
 
     .title {
         font-size: 3.5rem;
+    }
+
+    .actionRow {
+        grid-template-columns: 1fr;
+    }
+
+    .ctaGroup {
+        grid-template-columns: 1fr;
     }
 }

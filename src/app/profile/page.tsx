@@ -7,6 +7,7 @@ import { DocumentCard } from '@/components/DocumentCard';
 import { createClient } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ToastProvider';
+import { Edit3, Trash2, AlertTriangle } from 'lucide-react';
 import styles from './profile.module.css';
 
 export default function ProfilePage() {
@@ -17,6 +18,8 @@ export default function ProfilePage() {
     const [editing, setEditing] = useState(false);
     const [fullName, setFullName] = useState('');
     const [avatarUrl, setAvatarUrl] = useState('');
+    const [deletingDocId, setDeletingDocId] = useState<string | null>(null);
+    const [deletingProfile, setDeletingProfile] = useState(false);
     const supabase = createClient();
     const router = useRouter();
     const { showToast } = useToast();
@@ -107,6 +110,59 @@ export default function ProfilePage() {
             showToast('Profil oppdatert!', 'success');
             setEditing(false);
             await fetchProfile(user.id);
+        }
+    }
+
+    async function handleDeleteDocument(docId: string, filePath?: string | null) {
+        if (!user) return;
+        const confirmed = window.confirm('Er du sikker på at du vil slette dette dokumentet?');
+        if (!confirmed) return;
+        setDeletingDocId(docId);
+        try {
+            if (filePath) {
+                await supabase.storage.from('documents').remove([filePath]);
+            }
+            const { error } = await supabase
+                .from('documents')
+                .delete()
+                .eq('id', docId)
+                .eq('user_id', user.id);
+            if (error) throw error;
+            setDocuments((prev) => prev.filter((doc) => doc.id !== docId));
+            showToast('Dokument slettet', 'success');
+        } catch (error: any) {
+            showToast('Kunne ikke slette dokumentet: ' + error.message, 'error');
+        } finally {
+            setDeletingDocId(null);
+        }
+    }
+
+    async function handleDeleteProfile() {
+        if (!user || deletingProfile) return;
+        const confirmed = window.confirm('Dette vil slette kontoen og alle dokumentene dine permanent. Fortsett?');
+        if (!confirmed) return;
+        setDeletingProfile(true);
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.access_token) {
+                throw new Error('Fant ikke aktiv sesjon');
+            }
+            const response = await fetch('/api/profile/delete', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ accessToken: session.access_token }),
+            });
+            if (!response.ok) {
+                const payload = await response.json().catch(() => ({}));
+                throw new Error(payload.error || 'Ukjent feil');
+            }
+            await supabase.auth.signOut();
+            showToast('Profilen din er slettet.', 'success');
+            router.push('/');
+        } catch (error: any) {
+            showToast('Kunne ikke slette profil: ' + error.message, 'error');
+        } finally {
+            setDeletingProfile(false);
         }
     }
 
@@ -208,25 +264,73 @@ export default function ProfilePage() {
                         {documents.length === 0 ? (
                             <div className={styles.empty}>
                                 <p>Du har ikke lastet opp noen dokumenter enda.</p>
+                                <Button onClick={() => router.push('/sell')}>Last opp første dokument</Button>
                             </div>
                         ) : (
                             <div className={styles.grid}>
                                 {documents.map((doc) => (
-                                    <DocumentCard
-                                        key={doc.id}
-                                        id={doc.id}
-                                        title={doc.title}
-                                        author={profile?.username || 'Deg'}
-                                        university={doc.university || 'Ukjent'}
-                                        courseCode={doc.course_code || 'N/A'}
-                                        price={doc.price}
-                                        pages={0}
-                                        type="Dokument"
-                                        rating={0}
-                                    />
+                                    <div key={doc.id} className={styles.docCard}>
+                                        <DocumentCard
+                                            id={doc.id}
+                                            title={doc.title}
+                                            author={profile?.username || 'Deg'}
+                                            university={doc.university || 'Ukjent'}
+                                            courseCode={doc.course_code || 'N/A'}
+                                            price={doc.price}
+                                            pages={doc.page_count || 0}
+                                            type="Dokument"
+                                            rating={0}
+                                            grade={doc.grade}
+                                            gradeVerified={doc.grade_verified}
+                                            viewCount={doc.view_count || 0}
+                                        />
+                                        <div className={styles.docMeta}>
+                                            <span>Oppdatert {new Date(doc.updated_at || doc.created_at).toLocaleDateString('nb-NO')}</span>
+                                            <span>{doc.preview_page_count || 1} forhåndsviste sider</span>
+                                        </div>
+                                        <div className={styles.docActions}>
+                                            <Button
+                                                variant="secondary"
+                                                size="sm"
+                                                onClick={() => router.push(`/profile/dokument/${doc.id}`)}
+                                            >
+                                                <Edit3 size={16} />
+                                                Rediger
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className={styles.deleteButton}
+                                                onClick={() => handleDeleteDocument(doc.id, doc.file_path)}
+                                                disabled={deletingDocId === doc.id}
+                                            >
+                                                <Trash2 size={16} />
+                                                {deletingDocId === doc.id ? 'Sletter...' : 'Slett'}
+                                            </Button>
+                                        </div>
+                                    </div>
                                 ))}
                             </div>
                         )}
+                    </div>
+
+                    <div className={`${styles.section} ${styles.dangerSection}`}>
+                        <div className={styles.dangerCopy}>
+                            <h2>Slett profil</h2>
+                            <p>
+                                Sletting av profilen vil fjerne alle dokumenter, statistikk og brukerdata permanent. Denne handlingen
+                                kan ikke angres.
+                            </p>
+                        </div>
+                        <Button
+                            variant="ghost"
+                            className={styles.dangerButton}
+                            onClick={handleDeleteProfile}
+                            disabled={deletingProfile}
+                        >
+                            <AlertTriangle size={16} />
+                            {deletingProfile ? 'Sletter profil...' : 'Slett profilen min'}
+                        </Button>
                     </div>
                 </div>
             </main>

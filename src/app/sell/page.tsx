@@ -433,12 +433,7 @@ export default function SellPage() {
                                 </div>
                                 <div className={styles.row}>
                                     <div className={styles.formGroup}>
-                                        <label>
-                                            Karakter
-                                            <span className={styles.hint} title="Velg karakteren du fikk på dokumentet">
-                                                <Info size={16} />
-                                            </span>
-                                        </label>
+                                        <label>Karakter</label>
                                         <select
                                             className={styles.input}
                                             value={grade}

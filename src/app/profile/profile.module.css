@@ -177,6 +177,56 @@
     gap: 1.5rem;
 }
 
+.docCard {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.docMeta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.docActions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.docActions button svg {
+    margin-right: 0.35rem;
+}
+
+.deleteButton {
+    color: #b91c1c;
+}
+
+.dangerSection {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    align-items: center;
+    border: 1px solid #fee2e2;
+    background: #fef2f2;
+}
+
+.dangerCopy p {
+    margin: 0.5rem 0 0;
+    color: #991b1b;
+}
+
+.dangerButton {
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.dangerButton svg {
+    margin-right: 0.35rem;
+}
+
 @media (max-width: 768px) {
     .profileCard {
         flex-direction: column;
