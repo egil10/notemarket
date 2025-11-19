@@ -104,8 +104,8 @@ function SearchPageContent() {
         }));
     }
 
-    // Get unique values for filters and calculate ranges
-    const { universities, courseCodes, tags, pageRange, priceRange, yearRange } = useMemo(() => {
+    // Get unique values for filters
+    const { universities, courseCodes, tags } = useMemo(() => {
         const uniqueUniversities = Array.from(
             new Set(documents.map(doc => doc.university).filter(Boolean))
         ).sort();
@@ -119,37 +119,28 @@ function SearchPageContent() {
             .filter(Boolean);
         const uniqueTags = Array.from(new Set(allTags)).sort();
 
-        // Calculate ranges for sliders
-        const pages = documents.map(doc => doc.page_count || 0).filter(p => p > 0);
-        const prices = documents.map(doc => doc.price || 0).filter(p => p > 0);
-        const years = documents
-            .map(doc => {
-                if (doc.semester) {
-                    const yearMatch = doc.semester.match(/\d{4}/);
-                    return yearMatch ? parseInt(yearMatch[0]) : null;
-                }
-                return null;
-            })
-            .filter((y): y is number => y !== null);
-
         return {
             universities: uniqueUniversities,
             courseCodes: uniqueCourseCodes,
-            tags: uniqueTags,
-            pageRange: {
-                min: pages.length > 0 ? Math.min(...pages) : 0,
-                max: pages.length > 0 ? Math.max(...pages) : 1000
-            },
-            priceRange: {
-                min: prices.length > 0 ? Math.min(...prices) : 0,
-                max: prices.length > 0 ? Math.max(...prices) : 5000
-            },
-            yearRange: {
-                min: years.length > 0 ? Math.min(...years) : 2000,
-                max: years.length > 0 ? Math.max(...years) : new Date().getFullYear() + 1
-            }
+            tags: uniqueTags
         };
     }, [documents]);
+
+    // Fixed ranges for sliders (sensible defaults)
+    const pageRange = useMemo(() => ({
+        min: 1,
+        max: 300
+    }), []);
+
+    const priceRange = useMemo(() => ({
+        min: 1,
+        max: 1000
+    }), []);
+
+    const yearRange = useMemo(() => ({
+        min: 2010,
+        max: new Date().getFullYear()
+    }), []);
 
     const arraysEqual = (a: string[], b: string[]) =>
         a.length === b.length && a.every(item => b.includes(item));

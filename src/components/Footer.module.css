@@ -115,6 +115,13 @@
     padding-top: 1rem;
 }
 
+.footerActions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
 .tagline {
     font-size: 0.875rem;
     color: var(--text-muted);
@@ -127,9 +134,9 @@
     text-align: center;
 }
 
+/* Legacy support - keep for backwards compatibility */
 .themeToggleWrapper {
-    display: flex;
-    justify-content: flex-end;
+    display: contents;
 }
 
 /* Responsive Design */
@@ -154,7 +161,7 @@
         text-align: center;
     }
 
-    .themeToggleWrapper {
+    .footerActions {
         justify-content: center;
     }
 }

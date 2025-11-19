@@ -1,0 +1,125 @@
+.moodSection {
+    display: flex;
+    align-items: center;
+}
+
+.moodContainer {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.moodBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--border);
+    background: transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-muted);
+    padding: 0;
+    position: relative;
+    overflow: visible;
+}
+
+.moodBtn:hover {
+    border-color: var(--border-strong);
+    color: var(--text-main);
+    transform: translateY(-2px);
+}
+
+.moodBtn svg {
+    transition: all 0.3s ease;
+}
+
+.moodBtn:hover svg {
+    transform: scale(1.1);
+}
+
+/* Happy/Smile -> Laugh (Green) */
+.moodBtn.animateHappy svg {
+    animation: colorChangeGreen 1.5s ease-out;
+    color: #10b981;
+}
+
+@keyframes colorChangeGreen {
+    0% {
+        color: var(--text-muted);
+        transform: scale(1);
+    }
+    20% {
+        color: #10b981;
+        transform: scale(1.2);
+    }
+    80% {
+        color: #10b981;
+        transform: scale(1.1);
+    }
+    100% {
+        color: var(--text-muted);
+        transform: scale(1);
+    }
+}
+
+/* Neutral/Meh -> Annoyed (Yellow) */
+.moodBtn.animateNeutral svg {
+    animation: colorChangeYellow 1.5s ease-out;
+    color: #f59e0b;
+}
+
+@keyframes colorChangeYellow {
+    0% {
+        color: var(--text-muted);
+        transform: scale(1);
+    }
+    20% {
+        color: #f59e0b;
+        transform: scale(1.2);
+    }
+    80% {
+        color: #f59e0b;
+        transform: scale(1.1);
+    }
+    100% {
+        color: var(--text-muted);
+        transform: scale(1);
+    }
+}
+
+/* Sad/Frown -> Angry (Red) */
+.moodBtn.animateSad svg {
+    animation: colorChangeRed 1.5s ease-out;
+    color: #ef4444;
+}
+
+@keyframes colorChangeRed {
+    0% {
+        color: var(--text-muted);
+        transform: scale(1);
+    }
+    20% {
+        color: #ef4444;
+        transform: scale(1.2);
+    }
+    80% {
+        color: #ef4444;
+        transform: scale(1.1);
+    }
+    100% {
+        color: var(--text-muted);
+        transform: scale(1);
+    }
+}
+
+@media (max-width: 640px) {
+    .moodBtn {
+        width: 44px;
+        height: 44px;
+    }
+}
+
+

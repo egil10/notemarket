@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Github } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import { MoodButtons } from './MoodButtons';
 import styles from './Footer.module.css';
 
 export const Footer = () => {
@@ -77,7 +78,7 @@ export const Footer = () => {
                 {/* Divider */}
                 <div className={styles.divider}></div>
 
-                {/* Bottom Section: Tagline, Copyright, Theme Toggle */}
+                {/* Bottom Section: Tagline, Copyright, Mood & Theme Toggle */}
                 <div className={styles.bottomSection}>
                     <div className={styles.tagline}>
                         Norges største markedsplass for studiemateriale
@@ -85,7 +86,8 @@ export const Footer = () => {
                     <div className={styles.copyright}>
                         © {new Date().getFullYear()} NoteMarket. Alle rettigheter reservert.
                     </div>
-                    <div className={styles.themeToggleWrapper}>
+                    <div className={styles.footerActions}>
+                        <MoodButtons />
                         <ThemeToggle />
                     </div>
                 </div>
