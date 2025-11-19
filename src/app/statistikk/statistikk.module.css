@@ -205,18 +205,141 @@
   color: var(--text-muted);
 }
 
-@media (max-width: 768px) {
-  .barChart {
-    grid-template-columns: repeat(4, minmax(40px, 1fr));
+@media (max-width: 968px) {
+  .page {
+    padding: 2rem 0;
   }
-  
+
+  .container {
+    padding: 0 16px;
+  }
+
+  .statsRow {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .panelGrid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .statCard {
+    padding: 1.25rem;
+  }
+
+  .statValue {
+    font-size: 2rem;
+  }
+
+  .panel {
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 1.5rem 0;
+  }
+
+  .container {
+    padding: 0 12px;
+  }
+
+  .title {
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .statsRow {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .statCard {
+    padding: 1rem;
+  }
+
+  .statLabel {
+    font-size: 0.8125rem;
+  }
+
+  .statValue {
+    font-size: 1.75rem;
+  }
+
+  .statBadge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .panel {
+    padding: 1rem;
+  }
+
+  .panelHeader h2 {
+    font-size: 1.25rem;
+  }
+
+  .panelEyebrow {
+    font-size: 0.75rem;
+  }
+
+  .listRow {
+    padding: 0.75rem 0;
+  }
+
+  .valueBadge {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 0.875rem;
+  }
+
+  .listTitle {
+    font-size: 0.9375rem;
+  }
+
+  .listSub {
+    font-size: 0.8125rem;
+  }
+
+  .chartPanel {
+    padding: 1rem;
+  }
+
+  .chartHeader h2 {
+    font-size: 1.25rem;
+  }
+
   .chartSelects {
     flex-direction: column;
     width: 100%;
+    gap: 0.75rem;
   }
-  
+
   .chartSelect {
     width: 100%;
+  }
+
+  .chartSelect label {
+    font-size: 0.875rem;
+  }
+
+  .chartSelect select {
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    min-height: 44px;
+  }
+
+  .barChart {
+    grid-template-columns: repeat(6, minmax(30px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .barColumn p {
+    font-size: 0.6875rem;
   }
 }
 

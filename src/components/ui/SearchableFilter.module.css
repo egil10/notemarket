@@ -48,3 +48,20 @@
     font-style: italic;
 }
 
+@media (max-width: 640px) {
+    .searchInput {
+        padding: 0.75rem 0.75rem 0.75rem 2rem;
+        font-size: 0.875rem;
+        min-height: 44px;
+    }
+
+    .searchIcon {
+        left: 0.625rem;
+    }
+
+    .tagGrid {
+        max-height: 180px;
+        gap: 0.5rem;
+    }
+}
+

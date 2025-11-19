@@ -214,3 +214,76 @@
 .backLink:hover {
     color: var(--text-main);
 }
+
+@media (max-width: 640px) {
+    .container {
+        padding: 1rem;
+        min-height: auto;
+    }
+
+    .card {
+        padding: 1.5rem;
+    }
+
+    .title {
+        font-size: 1.5rem;
+    }
+
+    .subtitle {
+        font-size: 0.9375rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form {
+        gap: 1rem;
+    }
+
+    .formGroup input {
+        padding: 0.875rem;
+        font-size: 0.9375rem;
+        min-height: 44px;
+    }
+
+    .passwordToggle {
+        right: 0.875rem;
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .passwordRequirements {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .requirement {
+        font-size: 0.75rem;
+    }
+
+    .divider {
+        margin: 1.25rem 0;
+    }
+
+    .googleButton {
+        padding: 0.875rem;
+        min-height: 44px;
+    }
+
+    .error,
+    .success {
+        padding: 0.625rem;
+        font-size: 0.8125rem;
+    }
+
+    .footer {
+        margin-top: 1.5rem;
+        font-size: 0.8125rem;
+    }
+
+    .backLink {
+        margin-top: 1rem;
+        font-size: 0.8125rem;
+    }
+}

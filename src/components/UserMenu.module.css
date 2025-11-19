@@ -91,3 +91,30 @@
     background: var(--text-main);
     color: var(--surface);
 }
+
+@media (max-width: 640px) {
+    .profileButton {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        min-height: 44px;
+    }
+
+    .loginButton,
+    .signupButton {
+        padding: 0.5rem 1rem;
+        font-size: 0.8125rem;
+        min-height: 44px;
+    }
+
+    .dropdown {
+        min-width: 180px;
+        right: -0.5rem;
+    }
+
+    .dropdownItem {
+        padding: 0.875rem 1rem;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+}

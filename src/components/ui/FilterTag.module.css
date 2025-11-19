@@ -29,3 +29,12 @@
     background: var(--primary-dark);
     border-color: var(--primary-dark);
 }
+
+@media (max-width: 640px) {
+    .tag {
+        padding: 0.625rem 0.875rem;
+        font-size: 0.8125rem;
+        min-height: 36px;
+        touch-action: manipulation;
+    }
+}

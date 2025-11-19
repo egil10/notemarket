@@ -40,3 +40,37 @@
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 2rem;
 }
+
+@media (max-width: 768px) {
+    .featuredSection {
+        padding: 2.5rem 0;
+    }
+
+    .container {
+        padding: 0 16px;
+    }
+
+    .sectionHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .sectionHeader h2 {
+        font-size: 1.5rem;
+    }
+
+    .viewAll {
+        font-size: 0.9rem;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .sectionSub {
+        font-size: 0.875rem;
+    }
+}

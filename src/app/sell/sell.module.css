@@ -421,3 +421,125 @@
 .switchAuth:hover {
     text-decoration: underline;
 }
+
+@media (max-width: 768px) {
+    .main {
+        padding: 2rem 0;
+    }
+
+    .container {
+        padding: 0 16px;
+    }
+
+    .header {
+        margin-bottom: 2rem;
+    }
+
+    .title {
+        font-size: 2rem;
+    }
+
+    .subtitle {
+        font-size: 1.125rem;
+    }
+
+    .uploadCard,
+    .authCard {
+        padding: 1.5rem;
+    }
+
+    .dropzone {
+        padding: 2rem 1rem;
+    }
+
+    .form {
+        gap: 1.5rem;
+    }
+
+    .section {
+        padding: 1.25rem;
+    }
+
+    .row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .formGroup label {
+        font-size: 0.9rem;
+    }
+
+    .input,
+    .textarea {
+        padding: 0.875rem;
+        font-size: 0.9375rem;
+        min-height: 44px;
+    }
+
+    .textarea {
+        min-height: 120px;
+    }
+
+    .previewPanel {
+        padding: 1rem;
+    }
+
+    .priceBreakdown {
+        padding: 0.625rem;
+        font-size: 0.8125rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .main {
+        padding: 1.5rem 0;
+    }
+
+    .container {
+        padding: 0 12px;
+    }
+
+    .title {
+        font-size: 1.75rem;
+    }
+
+    .subtitle {
+        font-size: 1rem;
+    }
+
+    .uploadCard,
+    .authCard {
+        padding: 1.25rem;
+    }
+
+    .dropzone {
+        padding: 1.5rem 0.75rem;
+    }
+
+    .icon {
+        font-size: 2rem;
+    }
+
+    .section {
+        padding: 1rem;
+    }
+
+    .sectionHeader h2,
+    .sectionHeader h3 {
+        font-size: 1.125rem;
+    }
+
+    .formGroup label {
+        font-size: 0.875rem;
+    }
+
+    .input,
+    .textarea {
+        padding: 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .previewPanel {
+        padding: 0.75rem;
+    }
+}
