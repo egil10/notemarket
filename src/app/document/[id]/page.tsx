@@ -24,6 +24,7 @@ export default function DocumentPage() {
     const [navigationDisabled, setNavigationDisabled] = useState(false);
     const [showReportModal, setShowReportModal] = useState(false);
     const [reportReason, setReportReason] = useState('');
+    const [reportOtherText, setReportOtherText] = useState('');
     const [reportSubmitting, setReportSubmitting] = useState(false);
     const supabase = createClient();
     const { showToast } = useToast();
@@ -171,31 +172,44 @@ export default function DocumentPage() {
     };
 
     const handleReport = async () => {
-        if (!reportReason) {
-            showToast('Vennligst velg en årsak', 'error');
+        const finalReason = reportReason === 'annet' ? reportOtherText : reportReason;
+        
+        if (!finalReason || finalReason.trim() === '') {
+            showToast('Vennligst velg eller skriv en årsak', 'error');
             return;
         }
 
         setReportSubmitting(true);
 
         try {
-            const { error } = await supabase
-                .from('document_reports')
-                .insert({
-                    document_id: params.id,
-                    user_id: currentUser?.id || null,
-                    reason: reportReason,
-                    status: 'pending'
-                });
+            const reportData: any = {
+                document_id: params.id,
+                user_id: currentUser?.id || null,
+                reason: finalReason,
+                status: 'pending'
+            };
 
-            if (error) throw error;
+            // Optionally add IP and user agent if available (for moderation purposes)
+            // Note: These are optional fields
+
+            const { data, error } = await supabase
+                .from('document_reports')
+                .insert(reportData)
+                .select();
+
+            if (error) {
+                console.error('Supabase error:', error);
+                throw new Error(error.message || 'Kunne ikke sende rapport');
+            }
 
             showToast('Rapport sendt. Takk for tilbakemeldingen!', 'success');
             setShowReportModal(false);
             setReportReason('');
-        } catch (error) {
+            setReportOtherText('');
+        } catch (error: any) {
             console.error('Error submitting report:', error);
-            showToast('Kunne ikke sende rapport', 'error');
+            const errorMessage = error?.message || 'Kunne ikke sende rapport. Vennligst prøv igjen.';
+            showToast(errorMessage, 'error');
         } finally {
             setReportSubmitting(false);
         }
@@ -208,14 +222,24 @@ export default function DocumentPage() {
                 <div className={styles.container}>
                     <div className={styles.content}>
                         <div className={styles.preview}>
-                            <h3>Forhåndsvisning</h3>
+                            <div className={styles.previewHeader}>
+                                <h3>Forhåndsvisning</h3>
+                                <button
+                                    className={styles.reportButton}
+                                    onClick={() => setShowReportModal(true)}
+                                    title="Rapporter dokument"
+                                    aria-label="Rapporter dokument"
+                                >
+                                    <Flag size={20} />
+                                </button>
+                            </div>
                             {pdfUrl ? (
                                 <div className={styles.multiPreview} onContextMenu={(e) => e.preventDefault()}>
                                     <div className={styles.previewMetaRow}>
                                         <div className={styles.pageInfo}>
-                                            <span>Side {currentPage} av {totalPages}</span>
+                                            <span className={styles.viewableBadge}>Forhåndsvisning {maxViewablePages}/{totalPages} side(r)</span>
                                             {!isOwner && lockedPages > 0 && (
-                                                <span className={styles.lockedBadge}>{lockedPages} sider låst</span>
+                                                <span className={styles.lockedBadge}>{lockedPages} side(r) låst</span>
                                             )}
                                         </div>
                                         <div className={styles.carouselControls}>
@@ -273,17 +297,7 @@ export default function DocumentPage() {
 
                         <div className={styles.details}>
                             <div className={styles.header}>
-                                <div className={styles.titleRow}>
-                                    <h1 className={styles.title}>{document.title}</h1>
-                                    <button
-                                        className={styles.reportButton}
-                                        onClick={() => setShowReportModal(true)}
-                                        title="Rapporter dokument"
-                                        aria-label="Rapporter dokument"
-                                    >
-                                        <Flag size={20} />
-                                    </button>
-                                </div>
+                                <h1>{document.title}</h1>
                                 <div className={styles.meta}>
                                     <span className={styles.badge}>{document.course_code || 'N/A'}</span>
                                     <span className={styles.badge}>{document.university || 'Ukjent'}</span>
@@ -337,6 +351,101 @@ export default function DocumentPage() {
                     </div>
                 </div>
             </main>
+
+            {/* Report Modal */}
+            {showReportModal && (
+                <div className={styles.modalOverlay} onClick={() => !reportSubmitting && setShowReportModal(false)}>
+                    <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                        <div className={styles.modalHeader}>
+                            <h2>Rapporter dokument</h2>
+                            <button
+                                className={styles.modalClose}
+                                onClick={() => !reportSubmitting && setShowReportModal(false)}
+                                disabled={reportSubmitting}
+                                aria-label="Lukk"
+                            >
+                                ×
+                            </button>
+                        </div>
+                        <div className={styles.modalBody}>
+                            <p className={styles.modalDescription}>
+                                Hva er problemet med dette dokumentet?
+                            </p>
+                            <div className={styles.reportOptions}>
+                                <label className={styles.reportOption}>
+                                    <input
+                                        type="radio"
+                                        name="reportReason"
+                                        value="upassende"
+                                        checked={reportReason === 'upassende'}
+                                        onChange={(e) => setReportReason(e.target.value)}
+                                        disabled={reportSubmitting}
+                                    />
+                                    <span>Upassende innhold</span>
+                                </label>
+                                <label className={styles.reportOption}>
+                                    <input
+                                        type="radio"
+                                        name="reportReason"
+                                        value="juks"
+                                        checked={reportReason === 'juks'}
+                                        onChange={(e) => setReportReason(e.target.value)}
+                                        disabled={reportSubmitting}
+                                    />
+                                    <span>Fusk/juks</span>
+                                </label>
+                                <label className={styles.reportOption}>
+                                    <input
+                                        type="radio"
+                                        name="reportReason"
+                                        value="feil_info"
+                                        checked={reportReason === 'feil_info'}
+                                        onChange={(e) => setReportReason(e.target.value)}
+                                        disabled={reportSubmitting}
+                                    />
+                                    <span>Feil informasjon</span>
+                                </label>
+                                <label className={styles.reportOption}>
+                                    <input
+                                        type="radio"
+                                        name="reportReason"
+                                        value="annet"
+                                        checked={reportReason === 'annet'}
+                                        onChange={(e) => setReportReason(e.target.value)}
+                                        disabled={reportSubmitting}
+                                    />
+                                    <span>Annet</span>
+                                </label>
+                            </div>
+                            {reportReason === 'annet' && (
+                                <textarea
+                                    className={styles.reportTextarea}
+                                    placeholder="Beskriv problemet..."
+                                    value={reportOtherText}
+                                    onChange={(e) => setReportOtherText(e.target.value)}
+                                    disabled={reportSubmitting}
+                                    rows={4}
+                                />
+                            )}
+                        </div>
+                        <div className={styles.modalFooter}>
+                            <Button
+                                onClick={() => setShowReportModal(false)}
+                                variant="secondary"
+                                disabled={reportSubmitting}
+                            >
+                                Avbryt
+                            </Button>
+                            <Button
+                                onClick={handleReport}
+                                disabled={reportSubmitting}
+                            >
+                                {reportSubmitting ? 'Sender...' : 'Send rapport'}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

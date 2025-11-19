@@ -15,11 +15,10 @@
     justify-content: center;
     width: 40px;
     height: 40px;
-    border: 1px solid var(--border);
+    border: none;
     background: transparent;
-    border-radius: 50%;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: opacity 0.2s ease;
     color: var(--text-muted);
     padding: 0;
     position: relative;
@@ -27,91 +26,71 @@
 }
 
 .moodBtn:hover {
-    border-color: var(--border-strong);
-    color: var(--text-main);
-    transform: translateY(-2px);
+    opacity: 0.7;
 }
 
 .moodBtn svg {
-    transition: all 0.3s ease;
-}
-
-.moodBtn:hover svg {
-    transform: scale(1.1);
+    width: 20px;
+    height: 20px;
 }
 
 /* Happy/Smile -> Laugh (Green) */
 .moodBtn.animateHappy svg {
-    animation: colorChangeGreen 1.5s ease-out;
-    color: #10b981;
+    animation: colorChangeGreen 1.5s ease-out forwards;
 }
 
 @keyframes colorChangeGreen {
     0% {
         color: var(--text-muted);
-        transform: scale(1);
     }
-    20% {
+    10% {
         color: #10b981;
-        transform: scale(1.2);
     }
-    80% {
+    70% {
         color: #10b981;
-        transform: scale(1.1);
     }
     100% {
         color: var(--text-muted);
-        transform: scale(1);
     }
 }
 
 /* Neutral/Meh -> Annoyed (Yellow) */
 .moodBtn.animateNeutral svg {
-    animation: colorChangeYellow 1.5s ease-out;
-    color: #f59e0b;
+    animation: colorChangeYellow 1.5s ease-out forwards;
 }
 
 @keyframes colorChangeYellow {
     0% {
         color: var(--text-muted);
-        transform: scale(1);
     }
-    20% {
+    10% {
         color: #f59e0b;
-        transform: scale(1.2);
     }
-    80% {
+    70% {
         color: #f59e0b;
-        transform: scale(1.1);
     }
     100% {
         color: var(--text-muted);
-        transform: scale(1);
     }
 }
 
 /* Sad/Frown -> Angry (Red) */
 .moodBtn.animateSad svg {
-    animation: colorChangeRed 1.5s ease-out;
-    color: #ef4444;
+    animation: colorChangeRed 1.5s ease-out forwards;
 }
 
 @keyframes colorChangeRed {
     0% {
         color: var(--text-muted);
-        transform: scale(1);
     }
-    20% {
+    10% {
         color: #ef4444;
-        transform: scale(1.2);
     }
-    80% {
+    70% {
         color: #ef4444;
-        transform: scale(1.1);
     }
     100% {
         color: var(--text-muted);
-        transform: scale(1);
     }
 }
 
