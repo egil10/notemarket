@@ -19,7 +19,7 @@ export const ThemeToggle = () => {
 
   return (
     <fieldset className={styles.root}>
-      <legend className="sr-only">Velg tema</legend>
+      <legend className="sr-only">Theme selector</legend>
       {OPTIONS.map(({ label, value, icon: Icon }) => (
         <span key={value}>
           <input

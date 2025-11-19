@@ -1,8 +1,8 @@
 .root {
   display: inline-flex;
-  gap: 0.25rem;
-  border: 1px solid var(--border);
-  padding: 0.35rem;
+  gap: 0.5rem;
+  border: none;
+  padding: 0;
   align-items: center;
 }
 
@@ -16,13 +16,20 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid transparent;
+  border: none;
   cursor: pointer;
   color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.option:hover {
+  color: var(--text-main);
+  background-color: var(--surface-alt);
 }
 
 .root input:checked + .option {
-  border-color: var(--text-main);
+  background-color: var(--surface-alt);
   color: var(--text-main);
 }
 

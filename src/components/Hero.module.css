@@ -42,7 +42,7 @@
 
 .actionRow {
     display: grid;
-    grid-template-columns: minmax(400px, 2.5fr) minmax(160px, 0.6fr) minmax(160px, 0.6fr);
+    grid-template-columns: minmax(500px, 3.5fr) minmax(140px, 0.5fr) minmax(140px, 0.5fr);
     gap: 1rem;
     align-items: stretch;
 }
