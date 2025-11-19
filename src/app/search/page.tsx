@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, Dispatch, SetStateAction } from 'react';
 import { Header } from '@/components/Header';
 import { DocumentCard } from '@/components/DocumentCard';
 import { FilterTag } from '@/components/ui/FilterTag';
+import { SearchableFilter } from '@/components/ui/SearchableFilter';
 import { createClient } from '@/lib/supabase';
 import { getUniversityAbbreviation } from '@/lib/universities';
 import { Grid, List, SlidersHorizontal, Tag, School, BookOpen } from 'lucide-react';
@@ -21,6 +22,11 @@ export default function SearchPage() {
     const [applyingFilters, setApplyingFilters] = useState(false);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [sortBy, setSortBy] = useState('newest');
+    const [minPages, setMinPages] = useState('');
+    const [maxPages, setMaxPages] = useState('');
+    const [minPrice, setMinPrice] = useState('');
+    const [maxPrice, setMaxPrice] = useState('');
+    const [year, setYear] = useState('');
     const supabase = createClient();
 
     useEffect(() => {
@@ -92,6 +98,11 @@ export default function SearchPage() {
         setPendingUniversities([]);
         setPendingCourseCodes([]);
         setPendingTags([]);
+        setMinPages('');
+        setMaxPages('');
+        setMinPrice('');
+        setMaxPrice('');
+        setYear('');
         setApplyingFilters(true);
         setTimeout(() => setApplyingFilters(false), 300);
     };
@@ -137,7 +148,22 @@ export default function SearchPage() {
                 (docCourse && selectedCourseCodes.includes(docCourse));
             const matchesTags = selectedTags.length === 0 ||
                 (doc.tags && selectedTags.some(tag => doc.tags.includes(tag)));
-            return matchesUniversity && matchesCourseCode && matchesTags;
+            
+            // Page count filter
+            const docPages = doc.page_count || 0;
+            const matchesPages = (!minPages || docPages >= parseInt(minPages)) &&
+                (!maxPages || docPages <= parseInt(maxPages));
+            
+            // Price filter
+            const docPrice = doc.price || 0;
+            const matchesPrice = (!minPrice || docPrice >= parseFloat(minPrice)) &&
+                (!maxPrice || docPrice <= parseFloat(maxPrice));
+            
+            // Year filter
+            const matchesYear = !year || new Date(doc.created_at).getFullYear().toString() === year;
+            
+            return matchesUniversity && matchesCourseCode && matchesTags && 
+                   matchesPages && matchesPrice && matchesYear;
         });
 
         // Sort
@@ -157,7 +183,7 @@ export default function SearchPage() {
         }
 
         return filtered;
-    }, [documents, selectedUniversities, selectedCourseCodes, selectedTags, sortBy]);
+    }, [documents, selectedUniversities, selectedCourseCodes, selectedTags, sortBy, minPages, maxPages, minPrice, maxPrice, year]);
 
     const toggleUniversity = (uni: string) => {
         togglePending(uni, setPendingUniversities);
@@ -171,8 +197,10 @@ export default function SearchPage() {
         togglePending(tag, setPendingTags);
     };
 
-    const hasActiveFilters = selectedUniversities.length > 0 || selectedCourseCodes.length > 0 || selectedTags.length > 0;
-    const activeFilterCount = selectedUniversities.length + selectedCourseCodes.length + selectedTags.length;
+    const hasActiveFilters = selectedUniversities.length > 0 || selectedCourseCodes.length > 0 || selectedTags.length > 0 ||
+        minPages || maxPages || minPrice || maxPrice || year;
+    const activeFilterCount = selectedUniversities.length + selectedCourseCodes.length + selectedTags.length +
+        (minPages ? 1 : 0) + (maxPages ? 1 : 0) + (minPrice ? 1 : 0) + (maxPrice ? 1 : 0) + (year ? 1 : 0);
 
     return (
         <div className={styles.page}>
@@ -211,16 +239,13 @@ export default function SearchPage() {
                                         <School size={16} />
                                         <span>Universitet</span>
                                     </div>
-                                    <div className={styles.tagGrid}>
-                                        {universities.map((uni) => (
-                                            <FilterTag
-                                                key={uni}
-                                                label={getUniversityAbbreviation(uni)}
-                                                active={pendingUniversities.includes(uni)}
-                                                onClick={() => toggleUniversity(uni)}
-                                            />
-                                        ))}
-                                    </div>
+                                    <SearchableFilter
+                                        items={universities}
+                                        selectedItems={pendingUniversities}
+                                        onToggle={toggleUniversity}
+                                        getDisplayLabel={getUniversityAbbreviation}
+                                        placeholder="Søk etter universitet..."
+                                    />
                                 </div>
 
                                 {/* Course Code Filter */}
@@ -229,16 +254,85 @@ export default function SearchPage() {
                                         <BookOpen size={16} />
                                         <span>Fagkode</span>
                                     </div>
-                                    <div className={styles.tagGrid}>
-                                        {courseCodes.map((code) => (
-                                            <FilterTag
-                                                key={code}
-                                                label={code}
-                                                active={pendingCourseCodes.includes(code)}
-                                                onClick={() => toggleCourseCode(code)}
-                                            />
-                                        ))}
+                                    <SearchableFilter
+                                        items={courseCodes}
+                                        selectedItems={pendingCourseCodes}
+                                        onToggle={toggleCourseCode}
+                                        placeholder="Søk etter fagkode..."
+                                    />
+                                </div>
+
+                                {/* Pages Filter */}
+                                <div className={styles.filterSection}>
+                                    <div className={styles.filterTitle}>
+                                        <span>Antall sider</span>
                                     </div>
+                                    <div className={styles.rangeInputs}>
+                                        <input
+                                            type="number"
+                                            placeholder="Min"
+                                            value={minPages}
+                                            onChange={(e) => setMinPages(e.target.value)}
+                                            className={styles.rangeInput}
+                                            min="0"
+                                        />
+                                        <span className={styles.rangeSeparator}>-</span>
+                                        <input
+                                            type="number"
+                                            placeholder="Maks"
+                                            value={maxPages}
+                                            onChange={(e) => setMaxPages(e.target.value)}
+                                            className={styles.rangeInput}
+                                            min="0"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Price Filter */}
+                                <div className={styles.filterSection}>
+                                    <div className={styles.filterTitle}>
+                                        <span>Pris (NOK)</span>
+                                    </div>
+                                    <div className={styles.rangeInputs}>
+                                        <input
+                                            type="number"
+                                            placeholder="Min"
+                                            value={minPrice}
+                                            onChange={(e) => setMinPrice(e.target.value)}
+                                            className={styles.rangeInput}
+                                            min="0"
+                                            step="1"
+                                        />
+                                        <span className={styles.rangeSeparator}>-</span>
+                                        <input
+                                            type="number"
+                                            placeholder="Maks"
+                                            value={maxPrice}
+                                            onChange={(e) => setMaxPrice(e.target.value)}
+                                            className={styles.rangeInput}
+                                            min="0"
+                                            step="1"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Year Filter */}
+                                <div className={styles.filterSection}>
+                                    <div className={styles.filterTitle}>
+                                        <span>År</span>
+                                    </div>
+                                    <select
+                                        value={year}
+                                        onChange={(e) => setYear(e.target.value)}
+                                        className={styles.yearSelect}
+                                    >
+                                        <option value="">Alle år</option>
+                                        {Array.from({ length: 11 }, (_, i) => 2025 - i).map((yr) => (
+                                            <option key={yr} value={yr.toString()}>
+                                                {yr}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
 
                                 {/* Tags Filter */}
@@ -342,6 +436,51 @@ export default function SearchPage() {
                                             <span>×</span>
                                         </button>
                                     ))}
+                                    {minPages && (
+                                        <button
+                                            className={styles.filterChip}
+                                            onClick={() => setMinPages('')}
+                                        >
+                                            Min {minPages} sider
+                                            <span>×</span>
+                                        </button>
+                                    )}
+                                    {maxPages && (
+                                        <button
+                                            className={styles.filterChip}
+                                            onClick={() => setMaxPages('')}
+                                        >
+                                            Maks {maxPages} sider
+                                            <span>×</span>
+                                        </button>
+                                    )}
+                                    {minPrice && (
+                                        <button
+                                            className={styles.filterChip}
+                                            onClick={() => setMinPrice('')}
+                                        >
+                                            Min {minPrice} kr
+                                            <span>×</span>
+                                        </button>
+                                    )}
+                                    {maxPrice && (
+                                        <button
+                                            className={styles.filterChip}
+                                            onClick={() => setMaxPrice('')}
+                                        >
+                                            Maks {maxPrice} kr
+                                            <span>×</span>
+                                        </button>
+                                    )}
+                                    {year && (
+                                        <button
+                                            className={styles.filterChip}
+                                            onClick={() => setYear('')}
+                                        >
+                                            År {year}
+                                            <span>×</span>
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         )}

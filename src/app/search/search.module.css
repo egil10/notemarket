@@ -119,6 +119,51 @@
     gap: 0.5rem;
 }
 
+.rangeInputs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rangeInput {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 0.875rem;
+    font-family: var(--font-inter);
+    color: var(--text-main);
+    outline: none;
+    transition: border-color 0.15s ease;
+}
+
+.rangeInput:focus {
+    border-color: var(--primary);
+}
+
+.rangeSeparator {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    flex-shrink: 0;
+}
+
+.yearSelect {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 0.875rem;
+    font-family: var(--font-inter);
+    color: var(--text-main);
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s ease;
+}
+
+.yearSelect:focus {
+    border-color: var(--primary);
+}
+
 .clearButton {
     width: 100%;
     padding: 0.75rem;

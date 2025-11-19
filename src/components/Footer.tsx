@@ -24,8 +24,8 @@ export const Footer = () => {
                             Statistikk
                         </Link>
                         <span className={styles.text}>Om oss</span>
-                        <a href="mailto:notemarket@gmail.com" className={styles.link}>
-                            notemarket@gmail.com
+                        <a href="mailto:notemarket.no@gmail.com" className={styles.link}>
+                            notemarket.no@gmail.com
                         </a>
                         <span className={styles.text}>Vilkår</span>
                         <span className={styles.text}>Personvern</span>
