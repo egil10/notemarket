@@ -187,6 +187,16 @@ export default function DocumentPage() {
                                     <span className={styles.badge}>
                                         👁 {document.view_count ?? 0} visninger
                                     </span>
+                                    {document.page_count && (
+                                        <span className={styles.badge}>
+                                            {document.page_count} sider
+                                        </span>
+                                    )}
+                                    {document.file_size && (
+                                        <span className={styles.badge}>
+                                            {(document.file_size / (1024 * 1024)).toFixed(1)} MB
+                                        </span>
+                                    )}
                                 </div>
                             </div>
 
