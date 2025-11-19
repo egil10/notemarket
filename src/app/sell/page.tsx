@@ -147,29 +147,14 @@ export default function SellPage() {
                                     <>
                                         <h3>Dra og slipp filen din her</h3>
                                         <p>eller</p>
+                                        <label>Tittel på dokumentet</label>
                                         <input
-                                            type="file"
-                                            onChange={(e) => setFile(e.target.files?.[0] || null)}
-                                            style={{ display: 'none' }}
-                                            id="file-upload"
+                                            type="text"
+                                            className={styles.input}
+                                            value={title}
+                                            onChange={(e) => setTitle(e.target.value)}
                                         />
-                                        <label htmlFor="file-upload">
-                                            <Button variant="secondary" as="span">Velg fil fra datamaskin</Button>
-                                        </label>
-                                    </>
-                                )}
-                            </div>
-
-                            <div className={styles.form}>
-                                <div className={styles.formGroup}>
-                                    <label>Tittel på dokumentet</label>
-                                    <input
-                                        type="text"
-                                        className={styles.input}
-                                        value={title}
-                                        onChange={(e) => setTitle(e.target.value)}
-                                    />
-                                </div>
+                                    </div>
 
                                 <div className={styles.row}>
                                     <div className={styles.formGroup}>
