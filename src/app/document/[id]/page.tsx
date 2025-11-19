@@ -177,6 +177,7 @@ export default function DocumentPage() {
                                             <div className={styles.carouselFrame}>
                                                 <span className={styles.pageIndicator}>Side {currentPage}</span>
                                                 <iframe
+                                                    key={currentPage}
                                                     src={`${pdfUrl}#page=${currentPage}&view=FitH&toolbar=0&navpanes=0&scrollbar=0&zoom=100`}
                                                     className={styles.pdfFrame}
                                                     title={`PDF Preview page ${currentPage}`}
