@@ -12,8 +12,8 @@ export const Header = () => {
                     <Image
                         src="/logos/logo-nm-32-32.drawio.png"
                         alt="NoteMarket logo"
-                        width={32}
-                        height={32}
+                        width={64}
+                        height={28}
                         priority
                         className={styles.logoMark}
                     />

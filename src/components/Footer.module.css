@@ -35,9 +35,8 @@
 }
 
 .brandMark {
-    border: 1px solid var(--border-strong);
-    padding: 0.25rem;
-    background: var(--surface);
+    height: 32px;
+    width: auto;
 }
 
 .tagline {

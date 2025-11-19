@@ -12,8 +12,8 @@ export const Footer = () => {
                         <Image
                             src="/logos/logo-nm-32-32.drawio.png"
                             alt="NoteMarket logo"
-                            width={36}
-                            height={36}
+                            width={70}
+                            height={30}
                             className={styles.brandMark}
                         />
                         <span>NoteMarket</span>
