@@ -20,6 +20,8 @@ export default function DocumentPage() {
     const [currentUser, setCurrentUser] = useState<any>(null);
     const [username, setUsername] = useState<string>('user');
     const [currentPage, setCurrentPage] = useState(1);
+    const [isLoadingPage, setIsLoadingPage] = useState(false);
+    const [navigationDisabled, setNavigationDisabled] = useState(false);
     const supabase = createClient();
     const { showToast } = useToast();
 
@@ -138,16 +140,30 @@ export default function DocumentPage() {
     const isOnLockedPage = currentPage > maxViewablePages;
 
     const handlePrevPage = () => {
-        if (currentPage > 1) {
+        if (currentPage > 1 && !navigationDisabled) {
+            setNavigationDisabled(true);
+            setIsLoadingPage(true);
             setCurrentPage(currentPage - 1);
+            // Re-enable navigation after a short delay
+            setTimeout(() => {
+                setNavigationDisabled(false);
+                setIsLoadingPage(false);
+            }, 800);
         }
     };
 
     const handleNextPage = () => {
         // Allow navigation to one page beyond preview limit to show locked state
         const maxNavigablePage = maxViewablePages + (lockedPages > 0 ? 1 : 0);
-        if (currentPage < maxNavigablePage) {
+        if (currentPage < maxNavigablePage && !navigationDisabled) {
+            setNavigationDisabled(true);
+            setIsLoadingPage(true);
             setCurrentPage(currentPage + 1);
+            // Re-enable navigation after a short delay
+            setTimeout(() => {
+                setNavigationDisabled(false);
+                setIsLoadingPage(false);
+            }, 800);
         }
     };
 
@@ -176,13 +192,19 @@ export default function DocumentPage() {
                                         ) : (
                                             <div className={styles.carouselFrame}>
                                                 <span className={styles.pageIndicator}>Side {currentPage}</span>
+                                                {isLoadingPage && (
+                                                    <div className={styles.loadingOverlay}>
+                                                        <div className={styles.spinner}></div>
+                                                    </div>
+                                                )}
                                                 <iframe
                                                     key={currentPage}
                                                     src={`${pdfUrl}#page=${currentPage}&view=FitH&toolbar=0&navpanes=0&scrollbar=0&zoom=100`}
                                                     className={styles.pdfFrame}
                                                     title={`PDF Preview page ${currentPage}`}
                                                     onContextMenu={(e) => e.preventDefault()}
-                                                    style={{ pointerEvents: isOwner ? 'auto' : 'none' }}
+                                                    style={{ pointerEvents: isOwner ? 'auto' : 'none', opacity: isLoadingPage ? 0.5 : 1 }}
+                                                    loading="lazy"
                                                 />
                                             </div>
                                         )}
@@ -190,7 +212,7 @@ export default function DocumentPage() {
                                             <button
                                                 className={styles.carouselButton}
                                                 onClick={handlePrevPage}
-                                                disabled={currentPage === 1}
+                                                disabled={currentPage === 1 || navigationDisabled}
                                                 aria-label="Forrige side"
                                             >
                                                 <ChevronLeft size={24} />
@@ -198,7 +220,7 @@ export default function DocumentPage() {
                                             <button
                                                 className={styles.carouselButton}
                                                 onClick={handleNextPage}
-                                                disabled={currentPage >= maxViewablePages + (lockedPages > 0 ? 1 : 0)}
+                                                disabled={currentPage >= maxViewablePages + (lockedPages > 0 ? 1 : 0) || navigationDisabled}
                                                 aria-label="Neste side"
                                             >
                                                 <ChevronRight size={24} />
