@@ -14,7 +14,6 @@ export const Header = () => {
                 <nav className={styles.nav}>
                     <Link href="/search" className={styles.link}>Kjøp dokumenter</Link>
                     <Link href="/sell" className={styles.link}>Selg dokumenter</Link>
-                    <Link href="/request" className={styles.link}>Etterspør</Link>
                 </nav>
 
                 <div className={styles.actions}>

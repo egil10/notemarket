@@ -132,12 +132,20 @@ export default function DocumentPage() {
                         <div className={styles.preview}>
                             <h3>Forhåndsvisning</h3>
                             {pdfUrl ? (
-                                <div className={styles.pdfContainer}>
-                                    <iframe
-                                        src={`${pdfUrl}#page=1&view=FitH&toolbar=0&navpanes=0&scrollbar=0`}
-                                        className={styles.pdfFrame}
-                                        title="PDF Preview"
-                                    />
+                                <div
+                                    className={styles.pdfContainer}
+                                    onContextMenu={(e) => e.preventDefault()}
+                                >
+                                    <div className={styles.pdfPage}>
+                                        <p className={styles.pageIndicator}>Side 1 av {document.page_count || '?'}</p>
+                                        <iframe
+                                            src={`${pdfUrl}#page=1&view=FitH&toolbar=0&navpanes=0&scrollbar=0&zoom=100`}
+                                            className={styles.pdfFrame}
+                                            title="PDF Preview"
+                                            onContextMenu={(e) => e.preventDefault()}
+                                            style={{ pointerEvents: isOwner ? 'auto' : 'none' }}
+                                        />
+                                    </div>
                                     {!isOwner && (
                                         <div className={styles.blurOverlay}>
                                             <div className={styles.blurMessage}>

@@ -29,6 +29,8 @@ export const UNIVERSITIES = [
 
 export type University = typeof UNIVERSITIES[number];
 
+export const UNIVERSITY_NAMES = UNIVERSITIES.map(u => u.name);
+
 export function getUniversityAbbreviation(universityName: string): string {
     const university = UNIVERSITIES.find(u => u.name === universityName);
     return university?.abbreviation || universityName;
