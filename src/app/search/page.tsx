@@ -270,6 +270,8 @@ export default function SearchPage() {
                                         pages={doc.page_count || 0}
                                         type="Dokument"
                                         rating={0}
+                                        grade={doc.grade}
+                                        gradeVerified={doc.grade_verified}
                                     />
                                 ))}
                             </div>

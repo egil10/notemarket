@@ -132,11 +132,21 @@ export default function DocumentPage() {
                         <div className={styles.preview}>
                             <h3>Forhåndsvisning</h3>
                             {pdfUrl ? (
-                                <iframe
-                                    src={pdfUrl}
-                                    className={styles.pdfViewer}
-                                    title="PDF Preview"
-                                />
+                                <div className={styles.pdfContainer}>
+                                    <iframe
+                                        src={`${pdfUrl}#page=1&view=FitH&toolbar=0&navpanes=0&scrollbar=0`}
+                                        className={styles.pdfFrame}
+                                        title="PDF Preview"
+                                    />
+                                    {!isOwner && (
+                                        <div className={styles.blurOverlay}>
+                                            <div className={styles.blurMessage}>
+                                                <h3>Kjøp for å se hele dokumentet</h3>
+                                                <p>Dette er en forhåndsvisning av første side</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             ) : (
                                 <div className={styles.noPreview}>
                                     <p>Forhåndsvisning ikke tilgjengelig</p>

@@ -28,6 +28,9 @@ export default function SellPage() {
     const [description, setDescription] = useState('');
     const [pageCount, setPageCount] = useState('');
     const [tags, setTags] = useState('');
+    const [grade, setGrade] = useState('');
+    const [semester, setSemester] = useState('');
+    const [gradeProofUrl, setGradeProofUrl] = useState('');
 
     useEffect(() => {
         checkUser();
@@ -45,6 +48,13 @@ export default function SellPage() {
 
     async function handleUpload() {
         if (!file || !user) return;
+
+        // Validate grade proof if grade is selected
+        if (grade && !gradeProofUrl) {
+            showToast('Vennligst legg ved bevis for karakter (URL til karakterbevis)', 'error');
+            return;
+        }
+
         setUploading(true);
 
         try {
@@ -73,6 +83,10 @@ export default function SellPage() {
                     file_size: file.size,
                     page_count: pageCount ? parseInt(pageCount) : null,
                     tags: tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+                    grade: grade || null,
+                    semester: semester || null,
+                    grade_proof_url: gradeProofUrl || null,
+                    grade_verified: false,
                 });
 
             if (dbError) throw dbError;
@@ -87,6 +101,9 @@ export default function SellPage() {
             setDescription('');
             setPageCount('');
             setTags('');
+            setGrade('');
+            setSemester('');
+            setGradeProofUrl('');
         } catch (error: any) {
             showToast('Error uploading: ' + error.message, 'error');
         } finally {
@@ -228,6 +245,64 @@ export default function SellPage() {
                                     placeholder="Beskriv hva dokumentet inneholder..."
                                 />
                             </div>
+
+                            <div className={styles.row}>
+                                <div className={styles.formGroup}>
+                                    <label>
+                                        Karakter (valgfritt)
+                                        <span className={styles.hint} title="Velg karakteren du fikk på dokumentet"> ℹ️</span>
+                                    </label>
+                                    <select
+                                        className={styles.input}
+                                        value={grade}
+                                        onChange={(e) => setGrade(e.target.value)}
+                                    >
+                                        <option value="">Ingen karakter</option>
+                                        <option value="A">A</option>
+                                        <option value="B">B</option>
+                                        <option value="C">C</option>
+                                        <option value="D">D</option>
+                                        <option value="E">E</option>
+                                        <option value="F">F</option>
+                                    </select>
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label>Semester (valgfritt)</label>
+                                    <select
+                                        className={styles.input}
+                                        value={semester}
+                                        onChange={(e) => setSemester(e.target.value)}
+                                    >
+                                        <option value="">Velg semester</option>
+                                        <option value="Høst 2025">Høst 2025</option>
+                                        <option value="Vår 2025">Vår 2025</option>
+                                        <option value="Høst 2024">Høst 2024</option>
+                                        <option value="Vår 2024">Vår 2024</option>
+                                        <option value="Høst 2023">Høst 2023</option>
+                                        <option value="Vår 2023">Vår 2023</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            {grade && (
+                                <div className={styles.formGroup}>
+                                    <label>
+                                        Bevis for karakter (URL)
+                                        <span className={styles.hint} title="Link til karakterbevis, StudentWeb, eller skjermbilde"> ℹ️</span>
+                                    </label>
+                                    <input
+                                        type="url"
+                                        className={styles.input}
+                                        value={gradeProofUrl}
+                                        onChange={(e) => setGradeProofUrl(e.target.value)}
+                                        placeholder="https://..."
+                                        required={!!grade}
+                                    />
+                                    <p className={styles.gradeNote}>
+                                        Karakteren vil vises som "Venter på verifisering" til en admin har godkjent den.
+                                    </p>
+                                </div>
+                            )}
 
                             <Button fullWidth size="lg" onClick={handleUpload} disabled={uploading}>
                                 {uploading ? 'Laster opp...' : 'Last opp og publiser'}

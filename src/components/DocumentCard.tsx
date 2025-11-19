@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Badge } from './ui/Badge';
+import { GradeBadge } from './GradeBadge';
 import { getUniversityAbbreviation } from '@/lib/universities';
 import styles from './DocumentCard.module.css';
 
@@ -16,6 +17,8 @@ interface DocumentCardProps {
     pages: number;
     type: string;
     previewImage?: string;
+    grade?: string;
+    gradeVerified?: boolean;
 }
 
 export const DocumentCard = ({
@@ -28,7 +31,9 @@ export const DocumentCard = ({
     rating,
     pages,
     type,
-    previewImage = '/placeholder-doc.png'
+    previewImage = '/placeholder-doc.png',
+    grade,
+    gradeVerified = false
 }: DocumentCardProps) => {
     const universityAbbr = getUniversityAbbreviation(university);
     const displayCode = universityAbbr !== university
@@ -42,6 +47,11 @@ export const DocumentCard = ({
                 <div className={styles.placeholderImage}>
                     <span className={styles.docType}>{type}</span>
                 </div>
+                {grade && (
+                    <div className={styles.gradeBadgeOverlay}>
+                        <GradeBadge grade={grade} verified={gradeVerified} size="small" />
+                    </div>
+                )}
                 <div className={styles.overlay}>
                     <span className={styles.viewBtn}>Se detaljer</span>
                 </div>

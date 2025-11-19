@@ -1,0 +1,79 @@
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    box-shadow: var(--shadow-md);
+    text-transform: uppercase;
+}
+
+/* Grade colors */
+.gold {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    border: 2px solid #B8860B;
+    color: #000;
+}
+
+.silver {
+    background: linear-gradient(135deg, #E8E8E8 0%, #C0C0C0 100%);
+    border: 2px solid #A0A0A0;
+    color: #000;
+}
+
+.bronze {
+    background: linear-gradient(135deg, #CD7F32 0%, #B87333 100%);
+    border: 2px solid #8B5A2B;
+    color: #fff;
+}
+
+.standard {
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    color: var(--text-main);
+}
+
+/* Verification icons */
+.verified {
+    color: #22c55e;
+    flex-shrink: 0;
+}
+
+.pending {
+    color: #f59e0b;
+    flex-shrink: 0;
+}
+
+/* Sizes */
+.small {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+.small .letter {
+    font-size: 0.875rem;
+}
+
+.medium {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.medium .letter {
+    font-size: 1.25rem;
+}
+
+.large {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+}
+
+.large .letter {
+    font-size: 1.75rem;
+}
+
+.letter {
+    font-weight: 800;
+    line-height: 1;
+}

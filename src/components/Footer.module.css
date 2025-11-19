@@ -38,6 +38,14 @@
     color: var(--text-main);
 }
 
+.text {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
 .copyright {
     font-size: 0.75rem;
     color: var(--text-muted);
