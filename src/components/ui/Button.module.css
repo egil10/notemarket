@@ -2,12 +2,14 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 0.5rem;
+    border-radius: var(--radius-sm);
     font-weight: 500;
-    transition: all 0.2s ease;
+    transition: all 0.1s ease;
     font-family: var(--font-inter);
     gap: 0.5rem;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.875rem;
 }
 
 .button:disabled {
@@ -17,65 +19,68 @@
 
 /* Variants */
 .primary {
-    background-color: #2563eb;
-    color: white;
-    border: 1px solid #2563eb;
+    background-color: var(--primary);
+    color: var(--surface);
+    border: 1px solid var(--primary);
 }
 
 .primary:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+    background-color: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-hover);
 }
 
 .secondary {
-    background-color: white;
-    color: #1a1a1a;
-    border: 1px solid #d1d5db;
+    background-color: var(--surface);
+    color: var(--text-main);
+    border: 1px solid var(--border-strong);
 }
 
 .secondary:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+    background-color: var(--text-main);
+    color: var(--surface);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-hover);
 }
 
 .outline {
     background: transparent;
-    border: 1px solid #1a1a1a;
-    color: #1a1a1a;
+    border: 1px solid var(--border-strong);
+    color: var(--text-main);
 }
 
 .outline:hover:not(:disabled) {
-    background-color: #1a1a1a;
-    color: white;
+    background-color: var(--text-main);
+    color: var(--surface);
 }
 
 .ghost {
     background: transparent;
-    color: #595959;
+    color: var(--text-muted);
 }
 
 .ghost:hover:not(:disabled) {
     background-color: rgba(0, 0, 0, 0.05);
-    color: #1a1a1a;
+    color: var(--text-main);
 }
 
 /* Sizes */
 .sm {
     height: 32px;
     padding: 0 14px;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
 }
 
 .md {
     height: 44px;
     padding: 0 24px;
-    font-size: 0.95rem;
+    font-size: 0.875rem;
 }
 
 .lg {
     height: 56px;
     padding: 0 40px;
-    font-size: 1.1rem;
+    font-size: 0.875rem;
 }
 
 .fullWidth {
