@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { createClient } from '@/lib/supabase';
 import { useToast } from '@/components/ToastProvider';
 import { generateDocumentFilename } from '@/lib/universities';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import styles from './document.module.css';
 
@@ -18,6 +19,7 @@ export default function DocumentPage() {
     const [isOwner, setIsOwner] = useState(false);
     const [currentUser, setCurrentUser] = useState<any>(null);
     const [username, setUsername] = useState<string>('user');
+    const [currentPage, setCurrentPage] = useState(1);
     const supabase = createClient();
     const { showToast } = useToast();
 
@@ -131,8 +133,23 @@ export default function DocumentPage() {
 
     const previewLimit = document.preview_page_count || 1;
     const totalPages = document.page_count || previewLimit;
-    const previewPageCount = isOwner ? Math.min(totalPages, 6) : Math.min(previewLimit, totalPages, 6);
+    const maxViewablePages = isOwner ? totalPages : previewLimit;
     const lockedPages = !isOwner ? Math.max(totalPages - previewLimit, 0) : 0;
+    const isOnLockedPage = currentPage > maxViewablePages;
+
+    const handlePrevPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    const handleNextPage = () => {
+        // Allow navigation to one page beyond preview limit to show locked state
+        const maxNavigablePage = maxViewablePages + (lockedPages > 0 ? 1 : 0);
+        if (currentPage < maxNavigablePage) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
 
     return (
         <div className={styles.page}>
@@ -145,30 +162,47 @@ export default function DocumentPage() {
                             {pdfUrl ? (
                                 <div className={styles.multiPreview} onContextMenu={(e) => e.preventDefault()}>
                                     <div className={styles.previewMetaRow}>
-                                        <span>Viser {previewPageCount} av {totalPages} sider</span>
+                                        <span>Side {currentPage} av {totalPages}</span>
                                         {!isOwner && lockedPages > 0 && (
                                             <span className={styles.lockedBadge}>{lockedPages} sider låst</span>
                                         )}
                                     </div>
-                                    <div className={styles.pageGrid}>
-                                        {Array.from({ length: previewPageCount }).map((_, index) => (
-                                            <div className={styles.pageFrame} key={`preview-${index}`}>
-                                                <span className={styles.pageIndicator}>Side {index + 1}</span>
-                                                <iframe
-                                                    src={`${pdfUrl}#page=${index + 1}&view=FitH&toolbar=0&navpanes=0&scrollbar=0&zoom=100`}
-                                                    className={styles.pdfFrame}
-                                                    title={`PDF Preview page ${index + 1}`}
-                                                    onContextMenu={(e) => e.preventDefault()}
-                                                    style={{ pointerEvents: isOwner ? 'auto' : 'none' }}
-                                                />
-                                            </div>
-                                        ))}
-                                        {!isOwner && lockedPages > 0 && (
+                                    <div className={styles.carouselContainer}>
+                                        {isOnLockedPage ? (
                                             <div className={styles.lockedPanel}>
                                                 <h4>+ {lockedPages} sider</h4>
                                                 <p>Kjøp dokumentet for å låse opp resten.</p>
                                             </div>
+                                        ) : (
+                                            <div className={styles.carouselFrame}>
+                                                <span className={styles.pageIndicator}>Side {currentPage}</span>
+                                                <iframe
+                                                    src={`${pdfUrl}#page=${currentPage}&view=FitH&toolbar=0&navpanes=0&scrollbar=0&zoom=100`}
+                                                    className={styles.pdfFrame}
+                                                    title={`PDF Preview page ${currentPage}`}
+                                                    onContextMenu={(e) => e.preventDefault()}
+                                                    style={{ pointerEvents: isOwner ? 'auto' : 'none' }}
+                                                />
+                                            </div>
                                         )}
+                                        <div className={styles.carouselControls}>
+                                            <button
+                                                className={styles.carouselButton}
+                                                onClick={handlePrevPage}
+                                                disabled={currentPage === 1}
+                                                aria-label="Forrige side"
+                                            >
+                                                <ChevronLeft size={24} />
+                                            </button>
+                                            <button
+                                                className={styles.carouselButton}
+                                                onClick={handleNextPage}
+                                                disabled={currentPage >= maxViewablePages + (lockedPages > 0 ? 1 : 0)}
+                                                aria-label="Neste side"
+                                            >
+                                                <ChevronRight size={24} />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             ) : (
