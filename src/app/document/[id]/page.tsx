@@ -44,6 +44,9 @@ export default function DocumentPage() {
             setDocument(data);
             setIsOwner(user?.id === data.user_id);
 
+            // Increment view count (fire-and-forget)
+            supabase.rpc('increment_document_views', { doc_id: data.id }).catch(console.error);
+
             // Get signed URL for PDF
             const { data: urlData, error: urlError } = await supabase.storage
                 .from('documents')
@@ -123,6 +126,11 @@ export default function DocumentPage() {
         );
     }
 
+    const previewLimit = document.preview_page_count || 1;
+    const totalPages = document.page_count || previewLimit;
+    const previewPageCount = isOwner ? Math.min(totalPages, 6) : Math.min(previewLimit, totalPages, 6);
+    const lockedPages = !isOwner ? Math.max(totalPages - previewLimit, 0) : 0;
+
     return (
         <div className={styles.page}>
             <Header />
@@ -132,28 +140,33 @@ export default function DocumentPage() {
                         <div className={styles.preview}>
                             <h3>Forhåndsvisning</h3>
                             {pdfUrl ? (
-                                <div
-                                    className={styles.pdfContainer}
-                                    onContextMenu={(e) => e.preventDefault()}
-                                >
-                                    <div className={styles.pdfPage}>
-                                        <p className={styles.pageIndicator}>Side 1 av {document.page_count || '?'}</p>
-                                        <iframe
-                                            src={`${pdfUrl}#page=1&view=FitH&toolbar=0&navpanes=0&scrollbar=0&zoom=100`}
-                                            className={styles.pdfFrame}
-                                            title="PDF Preview"
-                                            onContextMenu={(e) => e.preventDefault()}
-                                            style={{ pointerEvents: isOwner ? 'auto' : 'none' }}
-                                        />
+                                <div className={styles.multiPreview} onContextMenu={(e) => e.preventDefault()}>
+                                    <div className={styles.previewMetaRow}>
+                                        <span>Viser {previewPageCount} av {totalPages} sider</span>
+                                        {!isOwner && lockedPages > 0 && (
+                                            <span className={styles.lockedBadge}>{lockedPages} sider låst</span>
+                                        )}
                                     </div>
-                                    {!isOwner && (
-                                        <div className={styles.blurOverlay}>
-                                            <div className={styles.blurMessage}>
-                                                <h3>Kjøp for å se hele dokumentet</h3>
-                                                <p>Dette er en forhåndsvisning av første side</p>
+                                    <div className={styles.pageGrid}>
+                                        {Array.from({ length: previewPageCount }).map((_, index) => (
+                                            <div className={styles.pageFrame} key={`preview-${index}`}>
+                                                <span className={styles.pageIndicator}>Side {index + 1}</span>
+                                                <iframe
+                                                    src={`${pdfUrl}#page=${index + 1}&view=FitH&toolbar=0&navpanes=0&scrollbar=0&zoom=100`}
+                                                    className={styles.pdfFrame}
+                                                    title={`PDF Preview page ${index + 1}`}
+                                                    onContextMenu={(e) => e.preventDefault()}
+                                                    style={{ pointerEvents: isOwner ? 'auto' : 'none' }}
+                                                />
                                             </div>
-                                        </div>
-                                    )}
+                                        ))}
+                                        {!isOwner && lockedPages > 0 && (
+                                            <div className={styles.lockedPanel}>
+                                                <h4>+ {lockedPages} sider</h4>
+                                                <p>Kjøp dokumentet for å låse opp resten.</p>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             ) : (
                                 <div className={styles.noPreview}>
@@ -168,6 +181,9 @@ export default function DocumentPage() {
                                 <div className={styles.meta}>
                                     <span className={styles.badge}>{document.course_code || 'N/A'}</span>
                                     <span className={styles.badge}>{document.university || 'Ukjent'}</span>
+                                    <span className={styles.badge}>
+                                        👁 {document.view_count ?? 0} visninger
+                                    </span>
                                 </div>
                             </div>
 

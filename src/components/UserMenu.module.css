@@ -44,6 +44,12 @@
     background: var(--primary);
     border: 1px solid var(--primary);
     color: var(--surface);
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 0.6rem 1.5rem;
 }
 
 .profileButton:hover {

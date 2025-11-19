@@ -9,6 +9,11 @@
     border-radius: var(--radius-sm);
 }
 
+.previewCard {
+    pointer-events: none;
+    border-style: dashed;
+}
+
 .card:hover {
     transform: none;
     /* No lift */
@@ -114,11 +119,14 @@
     color: var(--primary);
 }
 
-.rating {
+.viewCount {
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-weight: 600;
-    color: var(--text-main);
-    /* Black stars */
+    gap: 0.25rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.eye {
+    font-size: 1rem;
 }

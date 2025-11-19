@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { UserMenu } from './UserMenu';
 import styles from './Header.module.css';
 
@@ -8,7 +9,15 @@ export const Header = () => {
         <header className={styles.header}>
             <div className={styles.container}>
                 <Link href="/" className={styles.logo}>
-                    NoteMarket
+                    <Image
+                        src="/logos/logo-32-32.drawio.png"
+                        alt="NoteMarket logo"
+                        width={32}
+                        height={32}
+                        priority
+                        className={styles.logoMark}
+                    />
+                    <span>NoteMarket</span>
                 </Link>
 
                 <nav className={styles.nav}>

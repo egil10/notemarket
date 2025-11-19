@@ -41,10 +41,10 @@
     top: calc(100% + 0.25rem);
     left: 0;
     right: 0;
-    background: var(--bg);
-    border: 1px solid var(--border);
+    background: #ffffff;
+    border: 1px solid var(--border-strong);
     border-radius: 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     max-height: 240px;
     overflow-y: auto;
     z-index: 1000;
@@ -56,15 +56,15 @@
     font-size: 0.9375rem;
     transition: background-color 0.15s ease;
     border: none;
-    background: none;
+    background: transparent;
     width: 100%;
     text-align: left;
-    color: var(--text);
+    color: #1a1a1a;
 }
 
 .option:hover,
 .option.highlighted {
-    background-color: var(--bg-secondary);
+    background-color: #f0f0ed;
 }
 
 .noResults {

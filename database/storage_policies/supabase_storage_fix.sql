@@ -11,3 +11,4 @@ create policy "Authenticated users can view documents"
 -- create policy "Public can view documents"
 --   on storage.objects for select
 --   using ( bucket_id = 'documents' );
+

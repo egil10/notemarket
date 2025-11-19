@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Dispatch, SetStateAction } from 'react';
 import { Header } from '@/components/Header';
 import { DocumentCard } from '@/components/DocumentCard';
 import { FilterTag } from '@/components/ui/FilterTag';
@@ -15,8 +15,13 @@ export default function SearchPage() {
     const [selectedUniversities, setSelectedUniversities] = useState<string[]>([]);
     const [selectedCourseCodes, setSelectedCourseCodes] = useState<string[]>([]);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const [pendingUniversities, setPendingUniversities] = useState<string[]>([]);
+    const [pendingCourseCodes, setPendingCourseCodes] = useState<string[]>([]);
+    const [pendingTags, setPendingTags] = useState<string[]>([]);
+    const [applyingFilters, setApplyingFilters] = useState(false);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [sortBy, setSortBy] = useState('newest');
+    const [chartCourse, setChartCourse] = useState<string | null>(null);
     const supabase = createClient();
 
     useEffect(() => {
@@ -37,6 +42,8 @@ export default function SearchPage() {
         setLoading(false);
     }
 
+    const yearsRange = useMemo(() => Array.from({ length: 11 }, (_, idx) => 2015 + idx), []);
+
     // Get unique values for filters
     const { universities, courseCodes, tags } = useMemo(() => {
         const uniqueUniversities = Array.from(
@@ -44,7 +51,7 @@ export default function SearchPage() {
         ).sort();
 
         const uniqueCourseCodes = Array.from(
-            new Set(documents.map(doc => doc.course_code).filter(Boolean))
+            new Set(documents.map(doc => doc.course_code?.toUpperCase()).filter(Boolean))
         ).sort();
 
         const allTags = documents
@@ -59,13 +66,78 @@ export default function SearchPage() {
         };
     }, [documents]);
 
+    const arraysEqual = (a: string[], b: string[]) =>
+        a.length === b.length && a.every(item => b.includes(item));
+
+    const hasPendingChanges =
+        !arraysEqual(selectedUniversities, pendingUniversities) ||
+        !arraysEqual(selectedCourseCodes, pendingCourseCodes) ||
+        !arraysEqual(selectedTags, pendingTags);
+
+    const applyPendingFilters = () => {
+        setSelectedUniversities(pendingUniversities);
+        setSelectedCourseCodes(pendingCourseCodes);
+        setSelectedTags(pendingTags);
+        setApplyingFilters(true);
+        setTimeout(() => setApplyingFilters(false), 400);
+    };
+
+    const clearPendingFilters = () => {
+        setPendingUniversities([]);
+        setPendingCourseCodes([]);
+        setPendingTags([]);
+    };
+
+    const clearAllFilters = () => {
+        setSelectedUniversities([]);
+        setSelectedCourseCodes([]);
+        setSelectedTags([]);
+        setPendingUniversities([]);
+        setPendingCourseCodes([]);
+        setPendingTags([]);
+        setApplyingFilters(true);
+        setTimeout(() => setApplyingFilters(false), 300);
+    };
+
+    const togglePending = (
+        value: string,
+        setter: Dispatch<SetStateAction<string[]>>
+    ) => {
+        setter(prev =>
+            prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value]
+        );
+    };
+
+    const removeActiveFilter = (type: 'university' | 'course' | 'tag', value: string) => {
+        const update = (setter: Dispatch<SetStateAction<string[]>>) =>
+            setter(prev => prev.filter(item => item !== value));
+
+        switch (type) {
+            case 'university':
+                update(setSelectedUniversities);
+                update(setPendingUniversities);
+                break;
+            case 'course':
+                update(setSelectedCourseCodes);
+                update(setPendingCourseCodes);
+                break;
+            case 'tag':
+                update(setSelectedTags);
+                update(setPendingTags);
+                break;
+        }
+        setApplyingFilters(true);
+        setTimeout(() => setApplyingFilters(false), 300);
+    };
+
     // Filter and sort documents
     const filteredAndSortedDocuments = useMemo(() => {
         let filtered = documents.filter(doc => {
+            const docCourse = doc.course_code?.toUpperCase();
             const matchesUniversity = selectedUniversities.length === 0 ||
                 selectedUniversities.includes(doc.university);
             const matchesCourseCode = selectedCourseCodes.length === 0 ||
-                selectedCourseCodes.includes(doc.course_code);
+                (docCourse && selectedCourseCodes.includes(docCourse));
             const matchesTags = selectedTags.length === 0 ||
                 (doc.tags && selectedTags.some(tag => doc.tags.includes(tag)));
             return matchesUniversity && matchesCourseCode && matchesTags;
@@ -90,31 +162,64 @@ export default function SearchPage() {
         return filtered;
     }, [documents, selectedUniversities, selectedCourseCodes, selectedTags, sortBy]);
 
+    const courseYearCounts = useMemo(() => {
+        const map = new Map<string, Map<number, number>>();
+        documents.forEach(doc => {
+            const course = doc.course_code?.toUpperCase() || 'UKJENT';
+            const createdYear = new Date(doc.created_at).getFullYear();
+            if (createdYear < 2015 || createdYear > 2025) return;
+            if (!map.has(course)) {
+                map.set(course, new Map());
+            }
+            const yearMap = map.get(course)!;
+            yearMap.set(createdYear, (yearMap.get(createdYear) || 0) + 1);
+        });
+        return map;
+    }, [documents]);
+
+    const topCourseFallback = useMemo(() => {
+        const counts = new Map<string, number>();
+        documents.forEach(doc => {
+            const course = doc.course_code?.toUpperCase() || 'UKJENT';
+            counts.set(course, (counts.get(course) || 0) + 1);
+        });
+        const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+        return sorted[0]?.[0] || null;
+    }, [documents]);
+
+    useEffect(() => {
+        if (selectedCourseCodes.length > 0) {
+            setChartCourse(selectedCourseCodes[0]);
+        } else if (!chartCourse && topCourseFallback) {
+            setChartCourse(topCourseFallback);
+        }
+    }, [selectedCourseCodes, topCourseFallback, chartCourse]);
+
+    const chartSeries = useMemo(() => {
+        if (!chartCourse) return [];
+        const yearMap = courseYearCounts.get(chartCourse) || new Map<number, number>();
+        return yearsRange.map(year => ({
+            year,
+            value: yearMap.get(year) || 0,
+        }));
+    }, [chartCourse, courseYearCounts, yearsRange]);
+
+    const chartMax = Math.max(...chartSeries.map(item => item.value), 1);
+
     const toggleUniversity = (uni: string) => {
-        setSelectedUniversities(prev =>
-            prev.includes(uni) ? prev.filter(u => u !== uni) : [...prev, uni]
-        );
+        togglePending(uni, setPendingUniversities);
     };
 
     const toggleCourseCode = (code: string) => {
-        setSelectedCourseCodes(prev =>
-            prev.includes(code) ? prev.filter(c => c !== code) : [...prev, code]
-        );
+        togglePending(code.toUpperCase(), setPendingCourseCodes);
     };
 
     const toggleTag = (tag: string) => {
-        setSelectedTags(prev =>
-            prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
-        );
-    };
-
-    const clearFilters = () => {
-        setSelectedUniversities([]);
-        setSelectedCourseCodes([]);
-        setSelectedTags([]);
+        togglePending(tag, setPendingTags);
     };
 
     const hasActiveFilters = selectedUniversities.length > 0 || selectedCourseCodes.length > 0 || selectedTags.length > 0;
+    const activeFilterCount = selectedUniversities.length + selectedCourseCodes.length + selectedTags.length;
 
     return (
         <div className={styles.page}>
@@ -126,6 +231,27 @@ export default function SearchPage() {
                         <div className={styles.sidebarHeader}>
                             <SlidersHorizontal size={20} />
                             <h2>Filtre</h2>
+                        </div>
+
+                        <div className={styles.applyBar}>
+                            <button
+                                className={styles.applyButton}
+                                onClick={applyPendingFilters}
+                                disabled={!hasPendingChanges}
+                            >
+                                Oppdater resultater
+                            </button>
+                            <button
+                                className={styles.secondaryButton}
+                                onClick={clearPendingFilters}
+                                disabled={
+                                    pendingUniversities.length === 0 &&
+                                    pendingCourseCodes.length === 0 &&
+                                    pendingTags.length === 0
+                                }
+                            >
+                                Nullstill valg
+                            </button>
                         </div>
 
                         {!loading && documents.length > 0 && (
@@ -141,7 +267,7 @@ export default function SearchPage() {
                                             <FilterTag
                                                 key={uni}
                                                 label={getUniversityAbbreviation(uni)}
-                                                active={selectedUniversities.includes(uni)}
+                                                active={pendingUniversities.includes(uni)}
                                                 onClick={() => toggleUniversity(uni)}
                                             />
                                         ))}
@@ -159,7 +285,7 @@ export default function SearchPage() {
                                             <FilterTag
                                                 key={code}
                                                 label={code}
-                                                active={selectedCourseCodes.includes(code)}
+                                                active={pendingCourseCodes.includes(code)}
                                                 onClick={() => toggleCourseCode(code)}
                                             />
                                         ))}
@@ -178,21 +304,19 @@ export default function SearchPage() {
                                                 <FilterTag
                                                     key={tag}
                                                     label={tag}
-                                                    active={selectedTags.includes(tag)}
+                                                    active={pendingTags.includes(tag)}
                                                     onClick={() => toggleTag(tag)}
                                                 />
                                             ))}
                                         </div>
                                     </div>
                                 )}
-
-                                {hasActiveFilters && (
-                                    <button onClick={clearFilters} className={styles.clearButton}>
-                                        Nullstill filtre
-                                    </button>
-                                )}
                             </>
                         )}
+
+                        <button onClick={clearAllFilters} className={styles.clearButton}>
+                            Nullstill alle filtre
+                        </button>
                     </aside>
 
                     {/* Main Content */}
@@ -202,6 +326,7 @@ export default function SearchPage() {
                                 <h1 className={styles.title}>Kjøp dokumenter</h1>
                                 <p className={styles.resultCount}>
                                     {filteredAndSortedDocuments.length} dokument{filteredAndSortedDocuments.length !== 1 ? 'er' : ''}
+                                    {applyingFilters && <span className={styles.refreshHint}>• Oppdaterer…</span>}
                                 </p>
                             </div>
 
@@ -238,6 +363,88 @@ export default function SearchPage() {
                             </div>
                         </div>
 
+                        {hasActiveFilters && (
+                            <div className={styles.activeFilters}>
+                                <p>Aktive filtre ({activeFilterCount}):</p>
+                                <div className={styles.filterChips}>
+                                    {selectedUniversities.map((uni) => (
+                                        <button
+                                            key={`uni-${uni}`}
+                                            className={styles.filterChip}
+                                            onClick={() => removeActiveFilter('university', uni)}
+                                        >
+                                            {getUniversityAbbreviation(uni)}
+                                            <span>×</span>
+                                        </button>
+                                    ))}
+                                    {selectedCourseCodes.map((code) => (
+                                        <button
+                                            key={`course-${code}`}
+                                            className={styles.filterChip}
+                                            onClick={() => removeActiveFilter('course', code)}
+                                        >
+                                            {code}
+                                            <span>×</span>
+                                        </button>
+                                    ))}
+                                    {selectedTags.map((tag) => (
+                                        <button
+                                            key={`tag-${tag}`}
+                                            className={styles.filterChip}
+                                            onClick={() => removeActiveFilter('tag', tag)}
+                                        >
+                                            {tag}
+                                            <span>×</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        <section className={styles.chartPanel}>
+                            <div className={styles.chartHeader}>
+                                <div>
+                                    <p className={styles.chartEyebrow}>Historikk 2015–2025</p>
+                                    <h2>Dokumenter per år</h2>
+                                </div>
+                                <div className={styles.chartSelect}>
+                                    <label htmlFor="chart-course">Fagkode</label>
+                                    <select
+                                        id="chart-course"
+                                        value={chartCourse || ''}
+                                        onChange={(e) => setChartCourse(e.target.value || null)}
+                                    >
+                                        <option value="">Velg fagkode</option>
+                                        {courseCodes.map((code) => (
+                                            <option key={code} value={code}>
+                                                {code}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            {chartCourse && chartSeries.length > 0 ? (
+                                <div className={styles.barChart}>
+                                    {chartSeries.map(({ year, value }) => (
+                                        <div key={year} className={styles.barColumn}>
+                                            <div
+                                                className={styles.bar}
+                                                style={{ height: `${(value / chartMax) * 100}%` }}
+                                            >
+                                                <span>{value}</span>
+                                            </div>
+                                            <p>{year}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className={styles.placeholder}>
+                                    Velg en fagkode for å se historiske opplastinger.
+                                </div>
+                            )}
+                        </section>
+
                         {loading ? (
                             <div className={styles.loading}>Laster dokumenter...</div>
                         ) : filteredAndSortedDocuments.length === 0 ? (
@@ -245,7 +452,7 @@ export default function SearchPage() {
                                 {hasActiveFilters ? (
                                     <>
                                         <p>Ingen dokumenter funnet med valgte filtre.</p>
-                                        <button onClick={clearFilters} className={styles.clearButtonLarge}>
+                                        <button onClick={clearAllFilters} className={styles.clearButtonLarge}>
                                             Nullstill filtre
                                         </button>
                                     </>

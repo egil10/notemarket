@@ -44,22 +44,45 @@
     letter-spacing: 0.05em;
 }
 
-.pdfContainer {
-    position: relative;
-    width: 100%;
-    height: 800px;
-    background: #f5f5f5;
-    overflow: hidden;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
+.multiPreview {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
-.pdfPage {
+.previewMetaRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.lockedBadge {
+    padding: 0.25rem 0.75rem;
+    background: rgba(217, 78, 40, 0.1);
+    border: 1px solid #d94e28;
+    color: #d94e28;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+.pageGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.pageFrame {
     position: relative;
-    width: 100%;
-    height: 100%;
+    border: 1px solid var(--border);
+    background: #f5f5f5;
+    height: 320px;
+    overflow: hidden;
 }
 
 .pageIndicator {
@@ -68,10 +91,10 @@
     right: 10px;
     background: rgba(0, 0, 0, 0.7);
     color: white;
-    padding: 0.5rem 1rem;
+    padding: 0.4rem 0.8rem;
     border-radius: var(--radius-sm);
-    font-size: 0.875rem;
-    z-index: 5;
+    font-size: 0.8rem;
+    z-index: 2;
 }
 
 .pdfFrame {
@@ -81,47 +104,27 @@
     display: block;
 }
 
-.blurOverlay {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(
-        to bottom,
-        rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.7) 15%,
-        rgba(255, 255, 255, 0.95) 100%
-    );
-    backdrop-filter: blur(10px);
+.lockedPanel {
+    border: 2px dashed var(--border);
+    background: rgba(0, 0, 0, 0.03);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    pointer-events: none;
-    z-index: 10;
-}
-
-.blurMessage {
     text-align: center;
-    pointer-events: auto;
-    background: var(--surface);
-    padding: 2rem;
-    border: 2px solid var(--border-strong);
-    box-shadow: var(--shadow-lg);
+    gap: 0.25rem;
+    padding: 1rem;
 }
 
-.blurMessage h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--text-main);
-    margin-bottom: 0.5rem;
-    text-transform: none;
-    letter-spacing: normal;
+.lockedPanel h4 {
+    margin: 0;
+    font-size: 1.1rem;
 }
 
-.blurMessage p {
-    font-size: 1rem;
+.lockedPanel p {
+    margin: 0;
     color: var(--text-muted);
+    font-size: 0.9rem;
 }
 
 .noPreview {

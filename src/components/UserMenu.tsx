@@ -63,27 +63,29 @@ export const UserMenu = () => {
         );
     }
 
+    const greetingName = username || user.email?.split('@')[0] || 'deg';
+
     return (
         <div className={styles.menu} ref={dropdownRef}>
             <button
                 className={styles.profileButton}
                 onClick={() => setShowDropdown(!showDropdown)}
             >
-                Profil
+                Hei {greetingName}!
             </button>
 
             {showDropdown && (
                 <div className={styles.dropdown}>
                     <div className={styles.greeting}>
-                        Hei, {username || 'Bruker'}!
+                        Hei, {greetingName}!
                     </div>
                     <Link href="/profile" onClick={() => setShowDropdown(false)}>
                         <div className={styles.dropdownItem}>
-                            Profil
+                            PROFILE
                         </div>
                     </Link>
                     <div className={styles.dropdownItem} onClick={handleLogout}>
-                        Logg ut
+                        LOGOUT
                     </div>
                 </div>
             )}

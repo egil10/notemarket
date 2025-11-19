@@ -42,6 +42,55 @@
     letter-spacing: 0.05em;
 }
 
+.applyBar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.applyButton,
+.secondaryButton {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-strong);
+    font-size: 0.875rem;
+    font-family: var(--font-inter);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.applyButton {
+    background: var(--primary);
+    color: var(--surface);
+}
+
+.applyButton:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.applyButton:not(:disabled):hover {
+    background: var(--primary-dark);
+}
+
+.secondaryButton {
+    background: transparent;
+    color: var(--text-main);
+}
+
+.secondaryButton:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.secondaryButton:not(:disabled):hover {
+    background: var(--surface-alt);
+}
+
 .filterSection {
     margin-bottom: 1.5rem;
     padding-bottom: 1.5rem;
@@ -123,6 +172,12 @@
     color: var(--text-muted);
 }
 
+.refreshHint {
+    margin-left: 0.5rem;
+    font-style: italic;
+    color: var(--accent);
+}
+
 .headerRight {
     display: flex;
     gap: 1rem;
@@ -175,6 +230,129 @@
 .viewButton.active {
     background: var(--primary);
     color: var(--surface);
+}
+
+.activeFilters {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1rem 1.25rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filterChips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.filterChip {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: pointer;
+    transition: all 0.1s ease;
+}
+
+.filterChip span {
+    font-weight: 600;
+}
+
+.filterChip:hover {
+    background: var(--primary);
+    color: var(--surface);
+}
+
+.chartPanel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.chartHeader {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.chartEyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+}
+
+.chartSelect {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.chartSelect select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-family: var(--font-inter);
+}
+
+.barChart {
+    display: grid;
+    grid-template-columns: repeat(11, minmax(30px, 1fr));
+    gap: 0.75rem;
+    align-items: flex-end;
+}
+
+.barColumn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.bar {
+    width: 100%;
+    background: var(--primary);
+    border-radius: 0.25rem 0.25rem 0 0;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    min-height: 2rem;
+}
+
+.bar span {
+    font-size: 0.75rem;
+    color: var(--surface);
+    margin-bottom: 0.25rem;
+}
+
+.barColumn p {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.placeholder {
+    padding: 2rem;
+    border: 1px dashed var(--border);
+    border-radius: 0.75rem;
+    text-align: center;
+    color: var(--text-muted);
 }
 
 /* Grid View */
@@ -248,5 +426,9 @@
 
     .grid {
         grid-template-columns: 1fr;
+    }
+
+    .barChart {
+        grid-template-columns: repeat(4, minmax(40px, 1fr));
     }
 }

@@ -9,11 +9,13 @@ import styles from './page.module.css';
 
 export default function Home() {
   const [documents, setDocuments] = useState<any[]>([]);
+  const [topViewed, setTopViewed] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
 
   useEffect(() => {
     fetchDocuments();
+    fetchTopViewed();
   }, []);
 
   async function fetchDocuments() {
@@ -29,6 +31,20 @@ export default function Home() {
       setDocuments(data || []);
     }
     setLoading(false);
+  }
+
+  async function fetchTopViewed() {
+    const { data, error } = await supabase
+      .from('documents')
+      .select('*')
+      .order('view_count', { ascending: false })
+      .limit(6);
+
+    if (error) {
+      console.error('Error fetching top viewed documents:', error);
+    } else {
+      setTopViewed(data || []);
+    }
   }
 
   return (
@@ -69,12 +85,43 @@ export default function Home() {
                     rating={0}
                     grade={doc.grade}
                     gradeVerified={doc.grade_verified}
+                    viewCount={doc.view_count}
                   />
                 ))}
               </div>
             )}
           </div>
         </section>
+
+        {topViewed.length > 0 && (
+          <section className={styles.featuredSection}>
+            <div className={styles.container}>
+              <div className={styles.sectionHeader}>
+                <h2>Mest populære akkurat nå</h2>
+                <p className={styles.sectionSub}>Basert på visninger</p>
+              </div>
+              <div className={styles.grid}>
+                {topViewed.map((doc) => (
+                  <DocumentCard
+                    key={`top-${doc.id}`}
+                    id={doc.id}
+                    title={doc.title}
+                    author="Anonym"
+                    university={doc.university || 'Ukjent'}
+                    courseCode={doc.course_code || 'N/A'}
+                    price={doc.price}
+                    pages={doc.page_count || 0}
+                    type="Dokument"
+                    rating={0}
+                    grade={doc.grade}
+                    gradeVerified={doc.grade_verified}
+                    viewCount={doc.view_count}
+                  />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );

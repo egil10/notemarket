@@ -1,5 +1,4 @@
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Badge } from './ui/Badge';
 import { GradeBadge } from './GradeBadge';
@@ -19,6 +18,8 @@ interface DocumentCardProps {
     previewImage?: string;
     grade?: string;
     gradeVerified?: boolean;
+    previewMode?: boolean;
+    viewCount?: number;
 }
 
 export const DocumentCard = ({
@@ -33,17 +34,18 @@ export const DocumentCard = ({
     type,
     previewImage = '/placeholder-doc.png',
     grade,
-    gradeVerified = false
+    gradeVerified = false,
+    previewMode = false,
+    viewCount
 }: DocumentCardProps) => {
     const universityAbbr = getUniversityAbbreviation(university);
     const displayCode = universityAbbr !== university
         ? `${universityAbbr}-${courseCode.toUpperCase()}`
         : courseCode.toUpperCase();
 
-    return (
-        <Link href={`/document/${id}`} className={styles.card}>
+    const CardInner = (
+        <>
             <div className={styles.imageContainer}>
-                {/* In a real app, use next/image with actual src */}
                 <div className={styles.placeholderImage}>
                     <span className={styles.docType}>{type}</span>
                 </div>
@@ -72,13 +74,27 @@ export const DocumentCard = ({
 
                 <div className={styles.footer}>
                     <div className={styles.price}>{price},-</div>
-                    {rating && (
-                        <div className={styles.rating}>
-                            ★ {rating}
-                        </div>
-                    )}
+                    <div className={styles.viewCount}>
+                        <span className={styles.eye}>👁</span>
+                        <span>{viewCount ?? 0}</span>
+                    </div>
                 </div>
             </div>
+        </>
+    );
+
+    if (previewMode) {
+        return (
+            <div className={`${styles.card} ${styles.previewCard}`}>
+                {CardInner}
+            </div>
+        );
+    }
+
+    return (
+        <Link href={`/document/${id}`} className={styles.card}>
+            {CardInner}
         </Link>
     );
 };
+

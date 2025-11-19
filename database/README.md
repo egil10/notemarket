@@ -7,10 +7,13 @@ This folder contains SQL scripts for setting up the Supabase database.
 ### Initial Setup
 Run these scripts in order when setting up a new Supabase project:
 
-1. **`supabase_schema.sql`** - Creates the main `documents` table and storage bucket
-2. **`supabase_setup.sql`** - Creates the `profiles` table and user trigger
-3. **`supabase_avatars.sql`** - Creates the `avatars` storage bucket and policies
-4. **`supabase_storage_fix.sql`** - Updates storage policies for PDF viewing
+1. **`supabase_schema.sql`** – Creates the main `documents` table and storage bucket.
+2. **`supabase_setup.sql`** – Creates the `profiles` table + trigger.
+3. **`supabase_avatars.sql`** – Sets up the public `avatars` bucket/policies.
+4. **`add_document_stats.sql`** – Adds `file_size`, `page_count`, `preview_page_count`, and `view_count`.
+5. **`add_view_triggers.sql`** – Creates the RPC helpers that increment `view_count`.
+6. **`storage_policies/supabase_storage_fix.sql`** – Loosens storage policy so authenticated users can preview PDFs.
+7. **Optional**: `add_tags.sql`, `add_grade_system.sql`, `add_preview_settings.sql` (if not already covered in step 4).
 
 ## How to Run
 

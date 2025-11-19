@@ -64,18 +64,34 @@
     background: transparent;
 }
 
-.searchButton {
+.heroButton {
     border-radius: 0;
-    background: var(--primary);
-    color: var(--surface);
-    padding: 0 3rem;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     font-weight: 600;
-    border-left: 1px solid var(--border-strong);
 }
 
-.searchButton:hover {
-    background: var(--primary-dark);
+.searchButton {
+    border-left: 1px solid var(--border-strong);
+    padding: 0 3rem;
+}
+
+.ctaButton {
+    border: 1px solid var(--border-strong);
+    box-shadow: 8px 8px 0 rgba(0, 0, 0, 1);
+    padding: 1.15rem 2.75rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ctaButton:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 12px 12px 0 rgba(0, 0, 0, 1);
+}
+
+.ctaButtonSecondary {
+    background: var(--surface);
+    color: var(--text-main);
 }
 
 .ctaGroup {
