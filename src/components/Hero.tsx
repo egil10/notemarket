@@ -1,9 +1,29 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import { Button } from './ui/Button';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import styles from './Hero.module.css';
 
 export const Hero = () => {
+    const [searchQuery, setSearchQuery] = useState('');
+    const router = useRouter();
+
+    const handleSearch = () => {
+        if (searchQuery.trim()) {
+            router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+        } else {
+            router.push('/search');
+        }
+    };
+
+    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
+
     return (
         <section className={styles.hero}>
             <div className={styles.content}>
@@ -21,8 +41,17 @@ export const Hero = () => {
                             type="text"
                             placeholder="Søk etter fagkode (f.eks. JUS101) eller tema..."
                             className={styles.searchInput}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyPress={handleKeyPress}
                         />
-                        <Button size="lg" className={`${styles.heroButton} ${styles.searchButton}`}>Søk</Button>
+                        <Button
+                            size="lg"
+                            className={`${styles.heroButton} ${styles.searchButton}`}
+                            onClick={handleSearch}
+                        >
+                            Søk
+                        </Button>
                     </div>
 
                     <div className={styles.ctaGroup}>

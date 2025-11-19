@@ -54,10 +54,19 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    font-size: 0.9rem;
+    padding: 0.75rem 1rem;
+    background: var(--surface-alt);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.875rem;
     color: var(--text-muted);
+    gap: 1rem;
+}
+
+.pageInfo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
 }
 
 .lockedBadge {
@@ -120,17 +129,15 @@
 
 .carouselControls {
     display: flex;
-    justify-content: center;
-    gap: 1rem;
-    align-items: center;
+    gap: 0.5rem;
 }
 
 .carouselButton {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
+    width: 32px;
+    height: 32px;
     border: 1px solid var(--border);
     background: var(--surface);
     color: var(--text-main);
@@ -143,7 +150,7 @@
     background: var(--primary);
     border-color: var(--primary);
     color: var(--surface);
-    box-shadow: 0 4px 12px rgba(26, 71, 49, 0.3);
+    box-shadow: 0 2px 8px rgba(26, 71, 49, 0.2);
 }
 
 .carouselButton:active:not(:disabled) {
@@ -359,8 +366,8 @@
     }
 
     .carouselButton {
-        width: 44px;
-        height: 44px;
+        width: 36px;
+        height: 36px;
     }
 
     .lockedPanel {

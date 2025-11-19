@@ -1,16 +1,18 @@
 'use client';
 
-import { useState, useEffect, useMemo, Dispatch, SetStateAction } from 'react';
+import { useState, useEffect, useMemo, useRef, Suspense, Dispatch, SetStateAction } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { DocumentCard } from '@/components/DocumentCard';
 import { FilterTag } from '@/components/ui/FilterTag';
 import { SearchableFilter } from '@/components/ui/SearchableFilter';
+import { RangeSlider } from '@/components/ui/RangeSlider';
 import { createClient } from '@/lib/supabase';
 import { getUniversityAbbreviation } from '@/lib/universities';
-import { Grid, List, SlidersHorizontal, Tag, School, BookOpen } from 'lucide-react';
+import { Grid, List, SlidersHorizontal, Tag, School, BookOpen, Search } from 'lucide-react';
 import styles from './search.module.css';
 
-export default function SearchPage() {
+function SearchPageContent() {
     const [documents, setDocuments] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedUniversities, setSelectedUniversities] = useState<string[]>([]);
@@ -28,7 +30,39 @@ export default function SearchPage() {
     const [maxPrice, setMaxPrice] = useState('');
     const [minYear, setMinYear] = useState('');
     const [maxYear, setMaxYear] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchInput, setSearchInput] = useState('');
+    const [showAutocomplete, setShowAutocomplete] = useState(false);
+    const [selectedAutocompleteIndex, setSelectedAutocompleteIndex] = useState(-1);
+    const searchBarRef = useRef<HTMLDivElement>(null);
     const supabase = createClient();
+    const searchParams = useSearchParams();
+
+    // Read search query from URL on mount
+    useEffect(() => {
+        const q = searchParams.get('q');
+        if (q) {
+            setSearchQuery(q);
+            setSearchInput(q);
+        }
+    }, [searchParams]);
+
+    // Close autocomplete when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (searchBarRef.current && !searchBarRef.current.contains(event.target as Node)) {
+                setShowAutocomplete(false);
+                setSelectedAutocompleteIndex(-1);
+            }
+        };
+
+        if (showAutocomplete) {
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => {
+                document.removeEventListener('mousedown', handleClickOutside);
+            };
+        }
+    }, [showAutocomplete]);
 
     useEffect(() => {
         fetchDocuments();
@@ -51,7 +85,7 @@ export default function SearchPage() {
 
     async function enrichDocumentsWithAuthors(docs: any[]) {
         if (docs.length === 0) return docs;
-        
+
         const userIds = [...new Set(docs.map(doc => doc.user_id).filter(Boolean))];
         if (userIds.length === 0) return docs;
 
@@ -70,8 +104,8 @@ export default function SearchPage() {
         }));
     }
 
-    // Get unique values for filters
-    const { universities, courseCodes, tags } = useMemo(() => {
+    // Get unique values for filters and calculate ranges
+    const { universities, courseCodes, tags, pageRange, priceRange, yearRange } = useMemo(() => {
         const uniqueUniversities = Array.from(
             new Set(documents.map(doc => doc.university).filter(Boolean))
         ).sort();
@@ -85,10 +119,35 @@ export default function SearchPage() {
             .filter(Boolean);
         const uniqueTags = Array.from(new Set(allTags)).sort();
 
+        // Calculate ranges for sliders
+        const pages = documents.map(doc => doc.page_count || 0).filter(p => p > 0);
+        const prices = documents.map(doc => doc.price || 0).filter(p => p > 0);
+        const years = documents
+            .map(doc => {
+                if (doc.semester) {
+                    const yearMatch = doc.semester.match(/\d{4}/);
+                    return yearMatch ? parseInt(yearMatch[0]) : null;
+                }
+                return null;
+            })
+            .filter((y): y is number => y !== null);
+
         return {
             universities: uniqueUniversities,
             courseCodes: uniqueCourseCodes,
-            tags: uniqueTags
+            tags: uniqueTags,
+            pageRange: {
+                min: pages.length > 0 ? Math.min(...pages) : 0,
+                max: pages.length > 0 ? Math.max(...pages) : 1000
+            },
+            priceRange: {
+                min: prices.length > 0 ? Math.min(...prices) : 0,
+                max: prices.length > 0 ? Math.max(...prices) : 5000
+            },
+            yearRange: {
+                min: years.length > 0 ? Math.min(...years) : 2000,
+                max: years.length > 0 ? Math.max(...years) : new Date().getFullYear() + 1
+            }
         };
     }, [documents]);
 
@@ -172,24 +231,24 @@ export default function SearchPage() {
                 (docCourse && selectedCourseCodes.includes(docCourse));
             const matchesTags = selectedTags.length === 0 ||
                 (doc.tags && selectedTags.some(tag => doc.tags.includes(tag)));
-            
+
             // Page count filter
             const docPages = doc.page_count || 0;
             const matchesPages = (!minPages || docPages >= parseInt(minPages)) &&
                 (!maxPages || docPages <= parseInt(maxPages));
-            
+
             // Price filter
             const docPrice = doc.price || 0;
             const matchesPrice = (!minPrice || docPrice >= parseFloat(minPrice)) &&
                 (!maxPrice || docPrice <= parseFloat(maxPrice));
-            
+
             // Year filter
             const docYear = doc.year ? parseInt(doc.year) : null;
             const matchesYear = (!minYear || !docYear || docYear >= parseInt(minYear)) &&
                 (!maxYear || !docYear || docYear <= parseInt(maxYear));
-            
-            return matchesUniversity && matchesCourseCode && matchesTags && 
-                   matchesPages && matchesPrice && matchesYear;
+
+            return matchesUniversity && matchesCourseCode && matchesTags &&
+                matchesPages && matchesPrice && matchesYear;
         });
 
         // Sort
@@ -211,6 +270,76 @@ export default function SearchPage() {
         return filtered;
     }, [documents, selectedUniversities, selectedCourseCodes, selectedTags, sortBy, minPages, maxPages, minPrice, maxPrice, minYear, maxYear]);
 
+    // Get autocomplete suggestions (top 5 matching documents)
+    const autocompleteSuggestions = useMemo(() => {
+        if (!searchInput.trim() || searchInput.length < 2) return [];
+
+        const query = searchInput.toLowerCase().trim();
+        const keywords = query.split(/\s+/);
+
+        // Score and rank documents
+        const scored = filteredAndSortedDocuments.map(doc => {
+            const searchableText = [
+                doc.title || '',
+                doc.course_code || '',
+                doc.description || '',
+                doc.university || '',
+                ...(doc.tags || [])
+            ].join(' ').toLowerCase();
+
+            let score = 0;
+            
+            // Exact matches get highest score
+            if (searchableText.includes(query)) {
+                score += 100;
+            }
+            
+            // Title matches get high score
+            if (doc.title?.toLowerCase().includes(query)) {
+                score += 50;
+            }
+            
+            // Course code matches get high score
+            if (doc.course_code?.toLowerCase().includes(query)) {
+                score += 40;
+            }
+            
+            // Keyword matches
+            keywords.forEach(keyword => {
+                if (searchableText.includes(keyword)) {
+                    score += 10;
+                }
+            });
+
+            return { doc, score };
+        }).filter(item => item.score > 0)
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 5)
+          .map(item => item.doc);
+
+        return scored;
+    }, [filteredAndSortedDocuments, searchInput]);
+
+    // Smart search filtering
+    const searchedDocuments = useMemo(() => {
+        if (!searchQuery.trim()) return filteredAndSortedDocuments;
+
+        const keywords = searchQuery.toLowerCase().trim().split(/\s+/);
+
+        return filteredAndSortedDocuments.filter(doc => {
+            const searchableText = [
+                doc.title || '',
+                doc.course_code || '',
+                doc.description || '',
+                doc.university || '',
+                ...(doc.tags || [])
+            ].join(' ').toLowerCase();
+
+            // Match if ANY keyword is found in the searchable text
+            return keywords.some(keyword => searchableText.includes(keyword));
+        });
+    }, [filteredAndSortedDocuments, searchQuery]);
+
     const toggleUniversity = (uni: string) => {
         togglePending(uni, setPendingUniversities);
     };
@@ -221,6 +350,59 @@ export default function SearchPage() {
 
     const toggleTag = (tag: string) => {
         togglePending(tag, setPendingTags);
+    };
+
+    const performSearch = () => {
+        setSearchQuery(searchInput);
+        setShowAutocomplete(false);
+        setSelectedAutocompleteIndex(-1);
+    };
+
+    const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            if (selectedAutocompleteIndex >= 0 && autocompleteSuggestions[selectedAutocompleteIndex]) {
+                // Select the highlighted suggestion
+                const selectedDoc = autocompleteSuggestions[selectedAutocompleteIndex];
+                setSearchInput(selectedDoc.title || '');
+                setSearchQuery(selectedDoc.title || '');
+                setShowAutocomplete(false);
+                setSelectedAutocompleteIndex(-1);
+            } else {
+                performSearch();
+            }
+        } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            setShowAutocomplete(true);
+            setSelectedAutocompleteIndex(prev => 
+                prev < autocompleteSuggestions.length - 1 ? prev + 1 : prev
+            );
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            setSelectedAutocompleteIndex(prev => prev > 0 ? prev - 1 : -1);
+        } else if (e.key === 'Escape') {
+            setShowAutocomplete(false);
+            setSelectedAutocompleteIndex(-1);
+        }
+    };
+
+    const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchInput(e.target.value);
+        setShowAutocomplete(true);
+        setSelectedAutocompleteIndex(-1);
+    };
+
+    const selectAutocompleteSuggestion = (doc: any) => {
+        setSearchInput(doc.title || '');
+        setSearchQuery(doc.title || '');
+        setShowAutocomplete(false);
+        setSelectedAutocompleteIndex(-1);
+    };
+
+    const clearSearch = () => {
+        setSearchInput('');
+        setSearchQuery('');
+        setShowAutocomplete(false);
+        setSelectedAutocompleteIndex(-1);
     };
 
     const hasActiveFilters = selectedUniversities.length > 0 || selectedCourseCodes.length > 0 || selectedTags.length > 0 ||
@@ -270,6 +452,11 @@ export default function SearchPage() {
                                         selectedItems={pendingUniversities}
                                         onToggle={toggleUniversity}
                                         getDisplayLabel={getUniversityAbbreviation}
+                                        getSearchableText={(uni) => {
+                                            // Return both full name and abbreviation for searching
+                                            const abbr = getUniversityAbbreviation(uni);
+                                            return [uni, abbr];
+                                        }}
                                         placeholder="Søk etter universitet..."
                                     />
                                 </div>
@@ -284,6 +471,14 @@ export default function SearchPage() {
                                         items={courseCodes}
                                         selectedItems={pendingCourseCodes}
                                         onToggle={toggleCourseCode}
+                                        getSearchableText={(code) => {
+                                            // Return both uppercase and lowercase versions, and partial codes
+                                            const upper = code.toUpperCase();
+                                            const lower = code.toLowerCase();
+                                            // Also include parts like "STK" from "STK1110"
+                                            const parts = code.split(/[-_]/);
+                                            return [upper, lower, code, ...parts];
+                                        }}
                                         placeholder="Søk etter fagkode..."
                                     />
                                 </div>
@@ -293,24 +488,18 @@ export default function SearchPage() {
                                     <div className={styles.filterTitle}>
                                         <span>Antall sider</span>
                                     </div>
-                                    <div className={styles.rangeInputs}>
-                                        <input
-                                            type="number"
-                                            placeholder="Min"
-                                            value={minPages}
-                                            onChange={(e) => setMinPages(e.target.value)}
-                                            className={styles.rangeInput}
-                                            min="0"
-                                        />
-                                        <input
-                                            type="number"
-                                            placeholder="Maks"
-                                            value={maxPages}
-                                            onChange={(e) => setMaxPages(e.target.value)}
-                                            className={styles.rangeInput}
-                                            min="0"
-                                        />
-                                    </div>
+                                    <RangeSlider
+                                        min={pageRange.min}
+                                        max={pageRange.max}
+                                        minValue={minPages === '' ? '' : Number(minPages)}
+                                        maxValue={maxPages === '' ? '' : Number(maxPages)}
+                                        onChange={(min, max) => {
+                                            setMinPages(min === '' ? '' : String(min));
+                                            setMaxPages(max === '' ? '' : String(max));
+                                        }}
+                                        step={1}
+                                        formatLabel={(value) => `${value} sider`}
+                                    />
                                 </div>
 
                                 {/* Price Filter */}
@@ -318,26 +507,18 @@ export default function SearchPage() {
                                     <div className={styles.filterTitle}>
                                         <span>Pris (NOK)</span>
                                     </div>
-                                    <div className={styles.rangeInputs}>
-                                        <input
-                                            type="number"
-                                            placeholder="Min"
-                                            value={minPrice}
-                                            onChange={(e) => setMinPrice(e.target.value)}
-                                            className={styles.rangeInput}
-                                            min="0"
-                                            step="1"
-                                        />
-                                        <input
-                                            type="number"
-                                            placeholder="Maks"
-                                            value={maxPrice}
-                                            onChange={(e) => setMaxPrice(e.target.value)}
-                                            className={styles.rangeInput}
-                                            min="0"
-                                            step="1"
-                                        />
-                                    </div>
+                                    <RangeSlider
+                                        min={priceRange.min}
+                                        max={priceRange.max}
+                                        minValue={minPrice === '' ? '' : Number(minPrice)}
+                                        maxValue={maxPrice === '' ? '' : Number(maxPrice)}
+                                        onChange={(min, max) => {
+                                            setMinPrice(min === '' ? '' : String(min));
+                                            setMaxPrice(max === '' ? '' : String(max));
+                                        }}
+                                        step={10}
+                                        formatLabel={(value) => `${value} kr`}
+                                    />
                                 </div>
 
                                 {/* Year Filter */}
@@ -345,26 +526,17 @@ export default function SearchPage() {
                                     <div className={styles.filterTitle}>
                                         <span>År</span>
                                     </div>
-                                    <div className={styles.rangeInputs}>
-                                        <input
-                                            type="number"
-                                            placeholder="Fra"
-                                            value={minYear}
-                                            onChange={(e) => setMinYear(e.target.value)}
-                                            className={styles.rangeInput}
-                                            min="2000"
-                                            max="2030"
-                                        />
-                                        <input
-                                            type="number"
-                                            placeholder="Til"
-                                            value={maxYear}
-                                            onChange={(e) => setMaxYear(e.target.value)}
-                                            className={styles.rangeInput}
-                                            min="2000"
-                                            max="2030"
-                                        />
-                                    </div>
+                                    <RangeSlider
+                                        min={yearRange.min}
+                                        max={yearRange.max}
+                                        minValue={minYear === '' ? '' : Number(minYear)}
+                                        maxValue={maxYear === '' ? '' : Number(maxYear)}
+                                        onChange={(min, max) => {
+                                            setMinYear(min === '' ? '' : String(min));
+                                            setMaxYear(max === '' ? '' : String(max));
+                                        }}
+                                        step={1}
+                                    />
                                 </div>
 
                                 {/* Tags Filter */}
@@ -396,12 +568,74 @@ export default function SearchPage() {
                             <div className={styles.headerLeft}>
                                 <h1 className={styles.title}>Kjøp dokumenter</h1>
                                 <p className={styles.resultCount}>
-                                    {filteredAndSortedDocuments.length} dokument{filteredAndSortedDocuments.length !== 1 ? 'er' : ''}
+                                    {searchedDocuments.length} dokument{searchedDocuments.length !== 1 ? 'er' : ''}
                                     {applyingFilters && <span className={styles.refreshHint}>• Oppdaterer…</span>}
                                 </p>
                             </div>
 
                             <div className={styles.headerRight}>
+                                {/* Search Bar */}
+                                <div className={styles.searchBarContainer} ref={searchBarRef}>
+                                    <div className={styles.searchBar}>
+                                        <Search size={18} className={styles.searchIcon} />
+                                        <input
+                                            type="text"
+                                            placeholder="Søk etter fagkode, tema, eller nøkkelord..."
+                                            value={searchInput}
+                                            onChange={handleSearchInputChange}
+                                            onKeyDown={handleSearchKeyDown}
+                                            onFocus={() => setShowAutocomplete(true)}
+                                            className={styles.searchInput}
+                                        />
+                                        {searchInput && (
+                                            <button
+                                                onClick={clearSearch}
+                                                className={styles.clearSearch}
+                                                aria-label="Tøm søk"
+                                            >
+                                                ×
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={performSearch}
+                                            className={styles.searchButton}
+                                            aria-label="Søk"
+                                        >
+                                            Søk
+                                        </button>
+                                    </div>
+                                    {/* Autocomplete Dropdown */}
+                                    {showAutocomplete && autocompleteSuggestions.length > 0 && (
+                                        <div className={styles.autocompleteDropdown}>
+                                            {autocompleteSuggestions.map((doc, index) => (
+                                                <button
+                                                    key={doc.id}
+                                                    className={`${styles.autocompleteItem} ${index === selectedAutocompleteIndex ? styles.autocompleteItemActive : ''}`}
+                                                    onClick={() => selectAutocompleteSuggestion(doc)}
+                                                    onMouseEnter={() => setSelectedAutocompleteIndex(index)}
+                                                >
+                                                    <div className={styles.autocompleteItemContent}>
+                                                        <div className={styles.autocompleteItemTitle}>
+                                                            {doc.title || 'Uten tittel'}
+                                                        </div>
+                                                        <div className={styles.autocompleteItemMeta}>
+                                                            {doc.course_code && (
+                                                                <span className={styles.autocompleteItemCode}>
+                                                                    {doc.course_code}
+                                                                </span>
+                                                            )}
+                                                            {doc.university && (
+                                                                <span className={styles.autocompleteItemUni}>
+                                                                    {getUniversityAbbreviation(doc.university)}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                                 {/* Sort Dropdown */}
                                 <select
                                     value={sortBy}
@@ -546,7 +780,7 @@ export default function SearchPage() {
                             </div>
                         ) : (
                             <div className={viewMode === 'grid' ? styles.grid : styles.list}>
-                                {filteredAndSortedDocuments.map((doc) => (
+                                {searchedDocuments.map((doc) => (
                                     <DocumentCard
                                         key={doc.id}
                                         id={doc.id}
@@ -561,6 +795,8 @@ export default function SearchPage() {
                                         grade={doc.grade}
                                         gradeVerified={doc.grade_verified}
                                         viewCount={doc.view_count}
+                                        semester={doc.semester}
+                                        fileSize={doc.file_size}
                                     />
                                 ))}
                             </div>
@@ -569,5 +805,22 @@ export default function SearchPage() {
                 </div>
             </main>
         </div>
+    );
+}
+
+export default function SearchPage() {
+    return (
+        <Suspense fallback={
+            <div className={styles.page}>
+                <Header />
+                <main className={styles.main}>
+                    <div className={styles.container}>
+                        <div className={styles.loading}>Laster...</div>
+                    </div>
+                </main>
+            </div>
+        }>
+            <SearchPageContent />
+        </Suspense>
     );
 }

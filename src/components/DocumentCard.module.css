@@ -86,6 +86,21 @@
     align-items: flex-start;
 }
 
+.headerLeft {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.semesterBadge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    background: var(--surface-alt);
+    color: var(--text-main);
+    border: 1px solid var(--border);
+}
+
 .university {
     font-size: 0.75rem;
     color: var(--text-muted);
@@ -114,6 +129,11 @@
     border-top: 1px solid var(--border);
     padding-top: 1rem;
     margin-top: auto;
+    flex-wrap: wrap;
+}
+
+.fileSize {
+    color: var(--text-muted);
 }
 
 .footer {

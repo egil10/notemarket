@@ -283,6 +283,8 @@ export default function ProfilePage() {
                                             grade={doc.grade}
                                             gradeVerified={doc.grade_verified}
                                             viewCount={doc.view_count || 0}
+                                            semester={doc.semester}
+                                            fileSize={doc.file_size}
                                         />
                                         <div className={styles.docMeta}>
                                             <span>Oppdatert {new Date(doc.updated_at || doc.created_at).toLocaleDateString('nb-NO')}</span>

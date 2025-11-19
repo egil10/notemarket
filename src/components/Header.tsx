@@ -17,7 +17,7 @@ export const Header = () => {
                         priority
                         className={styles.logoMark}
                     />
-                    <span>NoteMarket</span>
+                    <span className={styles.brandText}>NoteMarket</span>
                 </Link>
 
                 <nav className={styles.nav}>

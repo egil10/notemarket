@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { createClient } from '@/lib/supabase';
 import { useToast } from '@/components/ToastProvider';
 import { generateDocumentFilename } from '@/lib/universities';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Flag } from 'lucide-react';
 import Link from 'next/link';
 import styles from './document.module.css';
 
@@ -22,6 +22,9 @@ export default function DocumentPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [isLoadingPage, setIsLoadingPage] = useState(false);
     const [navigationDisabled, setNavigationDisabled] = useState(false);
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [reportReason, setReportReason] = useState('');
+    const [reportSubmitting, setReportSubmitting] = useState(false);
     const supabase = createClient();
     const { showToast } = useToast();
 
@@ -167,6 +170,37 @@ export default function DocumentPage() {
         }
     };
 
+    const handleReport = async () => {
+        if (!reportReason) {
+            showToast('Vennligst velg en årsak', 'error');
+            return;
+        }
+
+        setReportSubmitting(true);
+
+        try {
+            const { error } = await supabase
+                .from('document_reports')
+                .insert({
+                    document_id: params.id,
+                    user_id: currentUser?.id || null,
+                    reason: reportReason,
+                    status: 'pending'
+                });
+
+            if (error) throw error;
+
+            showToast('Rapport sendt. Takk for tilbakemeldingen!', 'success');
+            setShowReportModal(false);
+            setReportReason('');
+        } catch (error) {
+            console.error('Error submitting report:', error);
+            showToast('Kunne ikke sende rapport', 'error');
+        } finally {
+            setReportSubmitting(false);
+        }
+    };
+
     return (
         <div className={styles.page}>
             <Header />
@@ -178,10 +212,30 @@ export default function DocumentPage() {
                             {pdfUrl ? (
                                 <div className={styles.multiPreview} onContextMenu={(e) => e.preventDefault()}>
                                     <div className={styles.previewMetaRow}>
-                                        <span>Side {currentPage} av {totalPages}</span>
-                                        {!isOwner && lockedPages > 0 && (
-                                            <span className={styles.lockedBadge}>{lockedPages} sider låst</span>
-                                        )}
+                                        <div className={styles.pageInfo}>
+                                            <span>Side {currentPage} av {totalPages}</span>
+                                            {!isOwner && lockedPages > 0 && (
+                                                <span className={styles.lockedBadge}>{lockedPages} sider låst</span>
+                                            )}
+                                        </div>
+                                        <div className={styles.carouselControls}>
+                                            <button
+                                                className={styles.carouselButton}
+                                                onClick={handlePrevPage}
+                                                disabled={currentPage === 1 || navigationDisabled}
+                                                aria-label="Forrige side"
+                                            >
+                                                <ChevronLeft size={16} />
+                                            </button>
+                                            <button
+                                                className={styles.carouselButton}
+                                                onClick={handleNextPage}
+                                                disabled={currentPage >= maxViewablePages + (lockedPages > 0 ? 1 : 0) || navigationDisabled}
+                                                aria-label="Neste side"
+                                            >
+                                                <ChevronRight size={16} />
+                                            </button>
+                                        </div>
                                     </div>
                                     <div className={styles.carouselContainer}>
                                         {isOnLockedPage ? (
@@ -208,24 +262,6 @@ export default function DocumentPage() {
                                                 />
                                             </div>
                                         )}
-                                        <div className={styles.carouselControls}>
-                                            <button
-                                                className={styles.carouselButton}
-                                                onClick={handlePrevPage}
-                                                disabled={currentPage === 1 || navigationDisabled}
-                                                aria-label="Forrige side"
-                                            >
-                                                <ChevronLeft size={24} />
-                                            </button>
-                                            <button
-                                                className={styles.carouselButton}
-                                                onClick={handleNextPage}
-                                                disabled={currentPage >= maxViewablePages + (lockedPages > 0 ? 1 : 0) || navigationDisabled}
-                                                aria-label="Neste side"
-                                            >
-                                                <ChevronRight size={24} />
-                                            </button>
-                                        </div>
                                     </div>
                                 </div>
                             ) : (
@@ -237,7 +273,17 @@ export default function DocumentPage() {
 
                         <div className={styles.details}>
                             <div className={styles.header}>
-                                <h1 className={styles.title}>{document.title}</h1>
+                                <div className={styles.titleRow}>
+                                    <h1 className={styles.title}>{document.title}</h1>
+                                    <button
+                                        className={styles.reportButton}
+                                        onClick={() => setShowReportModal(true)}
+                                        title="Rapporter dokument"
+                                        aria-label="Rapporter dokument"
+                                    >
+                                        <Flag size={20} />
+                                    </button>
+                                </div>
                                 <div className={styles.meta}>
                                     <span className={styles.badge}>{document.course_code || 'N/A'}</span>
                                     <span className={styles.badge}>{document.university || 'Ukjent'}</span>

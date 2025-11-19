@@ -109,6 +109,8 @@ export default function Home() {
                     grade={doc.grade}
                     gradeVerified={doc.grade_verified}
                     viewCount={doc.view_count}
+                    semester={doc.semester}
+                    fileSize={doc.file_size}
                   />
                 ))}
               </div>
@@ -139,6 +141,8 @@ export default function Home() {
                     grade={doc.grade}
                     gradeVerified={doc.grade_verified}
                     viewCount={doc.view_count}
+                    semester={doc.semester}
+                    fileSize={doc.file_size}
                   />
                 ))}
               </div>

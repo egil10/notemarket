@@ -20,6 +20,8 @@ interface DocumentCardProps {
     gradeVerified?: boolean;
     previewMode?: boolean;
     viewCount?: number;
+    semester?: string;
+    fileSize?: number; // File size in bytes
 }
 
 export const DocumentCard = ({
@@ -36,12 +38,21 @@ export const DocumentCard = ({
     grade,
     gradeVerified = false,
     previewMode = false,
-    viewCount
+    viewCount,
+    semester,
+    fileSize
 }: DocumentCardProps) => {
     const universityAbbr = getUniversityAbbreviation(university);
     const displayCode = universityAbbr !== university
         ? `${universityAbbr}-${courseCode.toUpperCase()}`
         : courseCode.toUpperCase();
+
+    // Format file size from bytes to MB
+    const formatFileSize = (bytes?: number): string => {
+        if (!bytes) return '';
+        const mb = bytes / (1024 * 1024);
+        return `${mb.toFixed(1)} MB`;
+    };
 
     const CardInner = (
         <>
@@ -61,7 +72,14 @@ export const DocumentCard = ({
 
             <div className={styles.content}>
                 <div className={styles.header}>
-                    <Badge variant="neutral">{displayCode}</Badge>
+                    <div className={styles.headerLeft}>
+                        <Badge variant="neutral">{displayCode}</Badge>
+                        {semester && (
+                            <Badge variant="neutral" className={styles.semesterBadge}>
+                                {semester}
+                            </Badge>
+                        )}
+                    </div>
                     <span className={styles.university}>{universityAbbr}</span>
                 </div>
 
@@ -70,6 +88,9 @@ export const DocumentCard = ({
                 <div className={styles.meta}>
                     <span className={styles.author}>av {author}</span>
                     <span className={styles.pages}>{pages} sider</span>
+                    {fileSize && (
+                        <span className={styles.fileSize}>{formatFileSize(fileSize)}</span>
+                    )}
                 </div>
 
                 <div className={styles.footer}>

@@ -489,7 +489,6 @@ export default function SellPage() {
                                         >
                                             <option value="">Velg semester</option>
                                             <option value="Vår">Vår</option>
-                                            <option value="Sommer">Sommer</option>
                                             <option value="Høst">Høst</option>
                                         </select>
                                     </div>
