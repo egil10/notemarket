@@ -43,9 +43,31 @@ export default function SearchPage() {
         if (error) {
             console.error('Error fetching documents:', error);
         } else {
-            setDocuments(data || []);
+            const documentsWithAuthors = await enrichDocumentsWithAuthors(data || []);
+            setDocuments(documentsWithAuthors);
         }
         setLoading(false);
+    }
+
+    async function enrichDocumentsWithAuthors(docs: any[]) {
+        if (docs.length === 0) return docs;
+        
+        const userIds = [...new Set(docs.map(doc => doc.user_id).filter(Boolean))];
+        if (userIds.length === 0) return docs;
+
+        const { data: profiles } = await supabase
+            .from('profiles')
+            .select('id, username')
+            .in('id', userIds);
+
+        const usernameMap = new Map(
+            (profiles || []).map(profile => [profile.id, profile.username])
+        );
+
+        return docs.map(doc => ({
+            ...doc,
+            author: usernameMap.get(doc.user_id) || 'Anonym'
+        }));
     }
 
     // Get unique values for filters
@@ -529,7 +551,7 @@ export default function SearchPage() {
                                         key={doc.id}
                                         id={doc.id}
                                         title={doc.title}
-                                        author="Anonym"
+                                        author={doc.author || 'Anonym'}
                                         university={doc.university || 'Ukjent'}
                                         courseCode={doc.course_code || 'N/A'}
                                         price={doc.price}
@@ -538,6 +560,7 @@ export default function SearchPage() {
                                         rating={0}
                                         grade={doc.grade}
                                         gradeVerified={doc.grade_verified}
+                                        viewCount={doc.view_count}
                                     />
                                 ))}
                             </div>
