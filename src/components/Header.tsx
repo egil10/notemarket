@@ -10,7 +10,7 @@ export const Header = () => {
             <div className={styles.container}>
                 <Link href="/" className={styles.logo}>
                     <Image
-                        src="/logos/logo-32-32.drawio.png"
+                        src="/logos/logo-nm-32-32.drawio.png"
                         alt="NoteMarket logo"
                         width={32}
                         height={32}

@@ -10,7 +10,7 @@ export const Footer = () => {
                 <div className={styles.brandRow}>
                     <Link href="/" className={styles.brand}>
                         <Image
-                            src="/logos/logo-32-32.drawio.png"
+                            src="/logos/logo-nm-32-32.drawio.png"
                             alt="NoteMarket logo"
                             width={36}
                             height={36}
