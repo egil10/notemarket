@@ -1,6 +1,6 @@
 .page {
     min-height: 100vh;
-    background-color: #f9fafb;
+    background-color: var(--background);
 }
 
 .main {
@@ -20,22 +20,113 @@
 
 .title {
     font-size: 2.5rem;
-    font-weight: 700;
-    color: #111827;
+    font-weight: 600;
+    color: var(--text-main);
     margin-bottom: 0.5rem;
     font-family: var(--font-outfit);
+    letter-spacing: -0.03em;
 }
 
 .subtitle {
     font-size: 1.125rem;
-    color: #6b7280;
+    color: var(--text-muted);
+}
+
+.filters {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.filterGroup {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filterGroup label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.filterSelect {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    font-size: 1rem;
+    font-family: var(--font-inter);
+    cursor: pointer;
+    transition: all 0.1s ease;
+}
+
+.filterSelect:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.clearButton {
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.1s ease;
+    white-space: nowrap;
+    font-family: var(--font-inter);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.clearButton:hover {
+    background: var(--text-main);
+    color: var(--surface);
+}
+
+.clearButtonLarge {
+    padding: 0.75rem 1.5rem;
+    background: var(--primary);
+    border: 1px solid var(--primary);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--surface);
+    cursor: pointer;
+    transition: all 0.1s ease;
+    margin-top: 1rem;
+    font-family: var(--font-inter);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.clearButtonLarge:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+.resultCount {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    white-space: nowrap;
 }
 
 .loading,
 .empty {
     text-align: center;
     padding: 4rem 2rem;
-    color: #6b7280;
+    color: var(--text-muted);
 }
 
 .empty p {
@@ -51,6 +142,19 @@
 @media (max-width: 768px) {
     .title {
         font-size: 2rem;
+    }
+
+    .filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filterGroup {
+        min-width: 100%;
+    }
+
+    .clearButton {
+        width: 100%;
     }
 
     .grid {

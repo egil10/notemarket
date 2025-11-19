@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { DocumentCard } from '@/components/DocumentCard';
 import { createClient } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/ToastProvider';
 import styles from './profile.module.css';
 
 export default function ProfilePage() {
@@ -18,6 +19,7 @@ export default function ProfilePage() {
     const [avatarUrl, setAvatarUrl] = useState('');
     const supabase = createClient();
     const router = useRouter();
+    const { showToast } = useToast();
 
     useEffect(() => {
         checkUser();
@@ -83,7 +85,7 @@ export default function ProfilePage() {
 
             setAvatarUrl(urlData.publicUrl);
         } catch (error: any) {
-            alert('Feil ved opplasting: ' + error.message);
+            showToast('Feil ved opplasting: ' + error.message, 'error');
         }
     }
 
@@ -100,9 +102,9 @@ export default function ProfilePage() {
             .eq('id', user.id);
 
         if (error) {
-            alert('Feil ved lagring: ' + error.message);
+            showToast('Feil ved lagring: ' + error.message, 'error');
         } else {
-            alert('Profil oppdatert!');
+            showToast('Profil oppdatert!', 'success');
             setEditing(false);
             await fetchProfile(user.id);
         }

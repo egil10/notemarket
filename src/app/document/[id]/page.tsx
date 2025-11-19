@@ -5,6 +5,8 @@ import { useParams } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/Button';
 import { createClient } from '@/lib/supabase';
+import { useToast } from '@/components/ToastProvider';
+import { generateDocumentFilename } from '@/lib/universities';
 import Link from 'next/link';
 import styles from './document.module.css';
 
@@ -15,7 +17,9 @@ export default function DocumentPage() {
     const [pdfUrl, setPdfUrl] = useState<string | null>(null);
     const [isOwner, setIsOwner] = useState(false);
     const [currentUser, setCurrentUser] = useState<any>(null);
+    const [username, setUsername] = useState<string>('user');
     const supabase = createClient();
+    const { showToast } = useToast();
 
     useEffect(() => {
         if (params.id) {
@@ -50,6 +54,19 @@ export default function DocumentPage() {
             } else {
                 console.error('Error creating signed URL:', urlError);
             }
+
+            // Fetch username if owner
+            if (user?.id === data.user_id) {
+                const { data: profileData } = await supabase
+                    .from('profiles')
+                    .select('username')
+                    .eq('id', data.user_id)
+                    .single();
+
+                if (profileData?.username) {
+                    setUsername(profileData.username);
+                }
+            }
         }
         setLoading(false);
     }
@@ -62,13 +79,19 @@ export default function DocumentPage() {
             .download(document.file_path);
 
         if (error) {
-            alert('Feil ved nedlasting: ' + error.message);
+            showToast('Feil ved nedlasting: ' + error.message, 'error');
         } else {
-            // Create a download link
+            // Create a download link with smart filename
+            const filename = generateDocumentFilename(
+                document.course_code || 'DOCUMENT',
+                document.title,
+                username
+            );
+
             const url = window.URL.createObjectURL(data);
             const a = window.document.createElement('a');
             a.href = url;
-            a.download = `${document.title}.pdf`;
+            a.download = filename;
             window.document.body.appendChild(a);
             a.click();
             window.document.body.removeChild(a);

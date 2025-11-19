@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Badge } from './ui/Badge';
+import { getUniversityAbbreviation } from '@/lib/universities';
 import styles from './DocumentCard.module.css';
 
 interface DocumentCardProps {
@@ -29,6 +30,11 @@ export const DocumentCard = ({
     type,
     previewImage = '/placeholder-doc.png'
 }: DocumentCardProps) => {
+    const universityAbbr = getUniversityAbbreviation(university);
+    const displayCode = universityAbbr !== university
+        ? `${universityAbbr}-${courseCode.toUpperCase()}`
+        : courseCode.toUpperCase();
+
     return (
         <Link href={`/document/${id}`} className={styles.card}>
             <div className={styles.imageContainer}>
@@ -43,8 +49,8 @@ export const DocumentCard = ({
 
             <div className={styles.content}>
                 <div className={styles.header}>
-                    <Badge variant="neutral">{courseCode}</Badge>
-                    <span className={styles.university}>{university}</span>
+                    <Badge variant="neutral">{displayCode}</Badge>
+                    <span className={styles.university}>{universityAbbr}</span>
                 </div>
 
                 <h3 className={styles.title} title={title}>{title}</h3>

@@ -6,11 +6,14 @@ import { Button } from '@/components/ui/Button';
 import { SuccessModal } from '@/components/SuccessModal';
 import { createClient } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/ToastProvider';
+import { UNIVERSITIES } from '@/lib/universities';
 import styles from './sell.module.css';
 
 export default function SellPage() {
     const supabase = createClient();
     const router = useRouter();
+    const { showToast } = useToast();
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
@@ -20,6 +23,7 @@ export default function SellPage() {
     // Form State
     const [title, setTitle] = useState('');
     const [courseCode, setCourseCode] = useState('');
+    const [university, setUniversity] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
 
@@ -58,12 +62,12 @@ export default function SellPage() {
                 .from('documents')
                 .insert({
                     title,
-                    course_code: courseCode,
+                    course_code: courseCode.toUpperCase(),
+                    university,
                     price: parseFloat(price),
                     description,
                     file_path: filePath,
                     user_id: user.id,
-                    university: 'Unknown' // Placeholder
                 });
 
             if (dbError) throw dbError;
@@ -76,7 +80,7 @@ export default function SellPage() {
             setPrice('');
             setDescription('');
         } catch (error: any) {
-            alert('Error uploading: ' + error.message);
+            showToast('Error uploading: ' + error.message, 'error');
         } finally {
             setUploading(false);
         }
@@ -152,6 +156,22 @@ export default function SellPage() {
                                         onChange={(e) => setCourseCode(e.target.value)}
                                         placeholder="Eks: JUS101"
                                     />
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label>Universitet</label>
+                                    <select
+                                        className={styles.input}
+                                        value={university}
+                                        onChange={(e) => setUniversity(e.target.value)}
+                                        required
+                                    >
+                                        <option value="">Velg universitet</option>
+                                        {UNIVERSITIES.map((uni) => (
+                                            <option key={uni.abbreviation} value={uni.name}>
+                                                {uni.name} ({uni.abbreviation})
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                                 <div className={styles.formGroup}>
                                     <label>Pris (NOK)</label>
