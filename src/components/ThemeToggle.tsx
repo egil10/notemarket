@@ -20,7 +20,7 @@ export const ThemeToggle = () => {
   return (
     <fieldset className={styles.root}>
       <legend className="sr-only">Velg tema</legend>
-      {OPTIONS.map(({ label, value, icon }) => (
+      {OPTIONS.map(({ label, value, icon: Icon }) => (
         <span key={value}>
           <input
             type="radio"
@@ -33,7 +33,7 @@ export const ThemeToggle = () => {
           />
           <label htmlFor={`theme-${value}`} className={styles.option}>
             <span className="sr-only">{label}</span>
-            {icon && <icon aria-hidden size={18} />}
+            <Icon aria-hidden size={18} />
           </label>
         </span>
       ))}

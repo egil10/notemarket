@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 
 export async function DELETE(request: NextRequest) {
     try {
@@ -7,6 +7,8 @@ export async function DELETE(request: NextRequest) {
         if (!accessToken) {
             return NextResponse.json({ error: 'Mangler tilgangstoken' }, { status: 400 });
         }
+
+        const supabaseAdmin = getSupabaseAdmin();
 
         const { data: userData, error: userError } = await supabaseAdmin.auth.getUser(accessToken);
         if (userError || !userData?.user) {
@@ -24,7 +26,7 @@ export async function DELETE(request: NextRequest) {
             return NextResponse.json({ error: docsError.message }, { status: 500 });
         }
 
-        const filesToRemove = (documents || [])
+        const filesToRemove = ((documents as Array<{ file_path: string | null }>) || [])
             .map((doc) => doc.file_path)
             .filter((path): path is string => Boolean(path));
 

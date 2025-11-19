@@ -320,7 +320,7 @@ export default function EditDocumentPage({ params }: Props) {
                                 pages={pdfMetadata?.pages || documentData.page_count || 0}
                                 type="PDF"
                                 grade={grade || undefined}
-                                gradeVerified={documentData.grade_verified}
+                                gradeVerified={documentData.grade_verified ?? undefined}
                             />
                             <div className={styles.previewMeta}>
                                 <span>
