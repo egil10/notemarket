@@ -39,9 +39,11 @@ export const UserMenu = () => {
     if (user) {
         return (
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>
-                    Hei, {user.user_metadata?.username || user.email?.split('@')[0]}
-                </span>
+                <Link href="/profile" style={{ textDecoration: 'none' }}>
+                    <span style={{ fontSize: '0.875rem', fontWeight: 500, color: '#111827', cursor: 'pointer' }}>
+                        Hei, {user.user_metadata?.username || user.email?.split('@')[0]}
+                    </span>
+                </Link>
                 <Button variant="ghost" size="sm" onClick={handleLogout}>
                     Logg ut
                 </Button>

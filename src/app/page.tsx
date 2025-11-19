@@ -1,57 +1,36 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { Hero } from '@/components/Hero';
 import { DocumentCard } from '@/components/DocumentCard';
+import { createClient } from '@/lib/supabase';
 import styles from './page.module.css';
 
-// Sample data based on user request
-const SAMPLE_DOCS = [
-  {
-    id: '1',
-    title: 'SOL3 kompendium med A-besvarelse fra H24',
-    author: 'nnh2025',
-    university: 'NHH',
-    courseCode: 'SOL3',
-    price: 199,
-    pages: 76,
-    type: 'Sammendrag',
-    rating: 5.0
-  },
-  {
-    id: '2',
-    title: 'SAM1A – Kompendium, undersøkelser + A-besvarelse',
-    author: 'KompendieKongen',
-    university: 'NHH',
-    courseCode: 'SAM1A',
-    price: 100,
-    pages: 72,
-    type: 'Sammendrag',
-    rating: 4.8
-  },
-  {
-    id: '3',
-    title: 'A-besvarelse Obligasjonsrett kont 2025',
-    author: 'Tryllemann',
-    university: 'UiB',
-    courseCode: 'JUS231',
-    price: 49,
-    pages: 12,
-    type: 'Eksamensbesvarelse',
-    rating: 4.5
-  },
-  {
-    id: '4',
-    title: 'Corporate Finance final exam 2024 GRA 6514',
-    author: 'BI legenden',
-    university: 'BI',
-    courseCode: 'GRA 6514',
-    price: 99,
-    pages: 5,
-    type: 'Eksamensbesvarelse',
-    rating: 4.2
-  }
-];
-
 export default function Home() {
+  const [documents, setDocuments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
+
+  useEffect(() => {
+    fetchDocuments();
+  }, []);
+
+  async function fetchDocuments() {
+    const { data, error } = await supabase
+      .from('documents')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(4);
+
+    if (error) {
+      console.error('Error fetching documents:', error);
+    } else {
+      setDocuments(data || []);
+    }
+    setLoading(false);
+  }
+
   return (
     <div className={styles.page}>
       <Header />
@@ -65,11 +44,33 @@ export default function Home() {
               <a href="/search" className={styles.viewAll}>Se alle dokumenter →</a>
             </div>
 
-            <div className={styles.grid}>
-              {SAMPLE_DOCS.map((doc) => (
-                <DocumentCard key={doc.id} {...doc} />
-              ))}
-            </div>
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>
+                Laster dokumenter...
+              </div>
+            ) : documents.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>
+                <p>Ingen dokumenter lastet opp enda.</p>
+                <p>Vær den første til å dele!</p>
+              </div>
+            ) : (
+              <div className={styles.grid}>
+                {documents.map((doc) => (
+                  <DocumentCard
+                    key={doc.id}
+                    id={doc.id}
+                    title={doc.title}
+                    author="Anonym"
+                    university={doc.university || 'Ukjent'}
+                    courseCode={doc.course_code || 'N/A'}
+                    price={doc.price}
+                    pages={0}
+                    type="Dokument"
+                    rating={0}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </section>
       </main>
